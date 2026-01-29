@@ -1,0 +1,31 @@
+---
+interface Props {
+    href: string;
+    label?: string;
+    variant?: "primary" | "secondary";
+}
+
+const { href, label = "Buy Now", variant = "primary" } = Astro.props;
+---
+
+<a
+    href={href}
+    class={`btn btn-${variant}`}
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    {label}
+</a>
+
+<style>
+    .btn-secondary {
+        background-color: transparent;
+        border: 2px solid var(--color-accent);
+        color: var(--color-accent);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-accent);
+        color: white;
+    }
+</style>

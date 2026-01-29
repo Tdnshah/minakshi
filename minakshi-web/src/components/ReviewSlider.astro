@@ -1,0 +1,155 @@
+---
+interface Review {
+    quote: string;
+    author: string;
+    source?: string;
+}
+
+interface Props {
+    reviews: Review[];
+}
+
+const { reviews } = Astro.props;
+---
+
+<section class="reviews">
+    <div class="container">
+        <h2 class="section-heading">Praise</h2>
+        <div class="reviews-grid">
+            {
+                reviews.map((review) => (
+                    <blockquote class="review-card">
+                        <p class="review-quote">"{review.quote}"</p>
+                        <footer class="review-author">
+                            — <strong>{review.author}</strong>
+                        </footer>
+                        {review.source && (
+                            <a
+                                href={review.source}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="read-more"
+                            >
+                                Read more →
+                            </a>
+                        )}
+                    </blockquote>
+                ))
+            }
+        </div>
+    </div>
+</section>
+
+<style>
+    .reviews {
+        padding: var(--spacing-xl) 0;
+        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+    }
+
+    .reviews {
+        padding: var(--spacing-xl) 0;
+        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+    }
+
+    .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .review-card {
+        padding: var(--spacing-lg);
+        background: white;
+        border-radius: 16px;
+        box-shadow: var(--shadow-sm);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .review-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--gradient-sunset);
+    }
+
+    .review-card:nth-child(2)::before {
+        background: var(--gradient-primary);
+    }
+
+    .review-card:nth-child(3)::before {
+        background: var(--gradient-warm);
+    }
+
+    .review-card:nth-child(4)::before {
+        background: var(--gradient-purple);
+    }
+
+    .review-card:nth-child(5)::before {
+        background: var(--gradient-sunset);
+    }
+
+    .review-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .review-quote {
+        font-family: var(--font-serif);
+        font-size: 1.1rem;
+        font-style: italic;
+        margin-bottom: var(--spacing-md);
+        color: var(--color-text-light);
+        line-height: 1.7;
+        position: relative;
+        padding-left: var(--spacing-md);
+    }
+
+    .review-quote::before {
+        content: '"';
+        position: absolute;
+        left: -5px;
+        top: -10px;
+        font-size: 4rem;
+        color: var(--color-accent);
+        opacity: 0.2;
+        font-family: Georgia, serif;
+    }
+
+    .review-author {
+        font-size: 0.95rem;
+        color: var(--color-text-light);
+        font-weight: 600;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .read-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: var(--spacing-sm);
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .read-more::after {
+        content: "→";
+        transition: transform 0.2s ease;
+    }
+
+    .read-more:hover {
+        color: var(--color-accent);
+    }
+
+    .read-more:hover::after {
+        transform: translateX(4px);
+    }
+</style>

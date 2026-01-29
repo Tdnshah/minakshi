@@ -1,0 +1,163 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const podcasts = await getCollection("podcasts");
+const sortedPodcasts = podcasts.sort(
+    (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+);
+
+// Format date helper
+const formatDate = (date: Date) => {
+    return new Intl.DateTimeFormat("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+    }).format(date);
+};
+---
+
+<BaseLayout title="Podcasts & Interviews">
+    <section class="section">
+        <div class="container">
+            <h1 class="page-title">Podcasts & Interviews</h1>
+            <p class="page-description">
+                Listen to conversations, interviews, and discussions featuring
+                Minakshi Dewan.
+            </p>
+
+            <div class="podcasts-grid">
+                {
+                    sortedPodcasts.map((podcast) => (
+                        <a
+                            href={`/podcasts/${podcast.id}`}
+                            class="podcast-card"
+                        >
+                            <article>
+                                <div class="podcast-content">
+                                    <div class="podcast-meta">
+                                        <span class="platform-badge">
+                                            {podcast.data.platform}
+                                        </span>
+                                        <time
+                                            datetime={podcast.data.publishedAt.toISOString()}
+                                        >
+                                            {formatDate(
+                                                podcast.data.publishedAt,
+                                            )}
+                                        </time>
+                                    </div>
+                                    <h2 class="podcast-title">
+                                        {podcast.data.title}
+                                    </h2>
+                                    {podcast.data.description && (
+                                        <p class="podcast-description">
+                                            {podcast.data.description}
+                                        </p>
+                                    )}
+                                    <span class="read-more">
+                                        Listen / Watch →
+                                    </span>
+                                </div>
+                            </article>
+                        </a>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    .page-title {
+        text-align: center;
+        margin-bottom: var(--spacing-sm);
+        font-size: 2.5rem;
+        color: var(--color-text-heading);
+    }
+
+    .page-description {
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto var(--spacing-xl);
+        color: var(--color-text-body);
+        font-size: 1.1rem;
+    }
+
+    .podcasts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .podcast-card {
+        text-decoration: none;
+        color: inherit;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+        overflow: hidden;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .podcast-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .podcast-content {
+        padding: var(--spacing-lg);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .podcast-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-md);
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .platform-badge {
+        background-color: var(--color-accent-light, #e0e7ff);
+        color: var(--color-accent, #4f46e5);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+    }
+
+    .podcast-title {
+        font-size: 1.25rem;
+        margin-bottom: var(--spacing-sm);
+        color: var(--color-text-heading);
+        line-height: 1.4;
+    }
+
+    .podcast-description {
+        font-size: 0.95rem;
+        color: var(--color-text-body);
+        margin-bottom: var(--spacing-lg);
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex-grow: 1;
+    }
+
+    .read-more {
+        color: var(--color-accent);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-top: auto;
+    }
+</style>

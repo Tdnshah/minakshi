@@ -1,0 +1,357 @@
+---
+const links = [
+    { href: "/", label: "Home" },
+    { href: "/about", label: "About" },
+    { href: "/books", label: "Books" },
+    {
+        label: "Publications",
+        children: [
+            { href: "/articles", label: "Articles" },
+            { href: "/research", label: "Research" },
+            { href: "/conferences", label: "Conferences" },
+            { href: "/consulting", label: "Consulting" },
+            { href: "/blog", label: "Blog" },
+        ],
+    },
+    {
+        label: "Media",
+        children: [
+            { href: "/media", label: "Press & News" },
+            { href: "/podcasts", label: "Podcasts" },
+        ],
+    },
+    { href: "/contact", label: "Contact" },
+];
+---
+
+<header class="header">
+    <div class="container header-content">
+        <a href="/" class="logo">Minakshi Dewan</a>
+
+        <button class="mobile-menu-toggle" aria-label="Toggle Menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+
+        <nav class="nav">
+            <ul class="nav-list">
+                {
+                    links.map((link) => (
+                        <li
+                            class={
+                                link.children
+                                    ? "nav-item has-dropdown"
+                                    : "nav-item"
+                            }
+                        >
+                            {link.children ? (
+                                <>
+                                    <button
+                                        class="nav-link dropdown-trigger"
+                                        aria-haspopup="true"
+                                        aria-expanded="false"
+                                    >
+                                        {link.label}
+                                        <svg
+                                            class="chevron"
+                                            width="10"
+                                            height="6"
+                                            viewBox="0 0 10 6"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                        >
+                                            <path
+                                                d="M1 1L5 5L9 1"
+                                                stroke="currentColor"
+                                                stroke-width="1.5"
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {link.children.map((child) => (
+                                            <li>
+                                                <a
+                                                    href={child.href}
+                                                    class="dropdown-link"
+                                                >
+                                                    {child.label}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </>
+                            ) : (
+                                <a href={link.href} class="nav-link">
+                                    {link.label}
+                                </a>
+                            )}
+                        </li>
+                    ))
+                }
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<script>
+    const mobileToggle = document.querySelector(".mobile-menu-toggle");
+    const nav = document.querySelector(".nav");
+    const dropdownTriggers = document.querySelectorAll(".dropdown-trigger");
+
+    if (mobileToggle && nav) {
+        mobileToggle.addEventListener("click", () => {
+            mobileToggle.classList.toggle("active");
+            nav.classList.toggle("active");
+            document.body.classList.toggle("no-scroll");
+        });
+    }
+
+    // Mobile dropdown toggle
+    dropdownTriggers.forEach((trigger) => {
+        trigger.addEventListener("click", (e) => {
+            if (window.innerWidth <= 768) {
+                e.preventDefault();
+                const parent = trigger.parentElement;
+                parent?.classList.toggle("active");
+            }
+        });
+    });
+</script>
+
+<style>
+    .header {
+        padding: var(--spacing-md) 0;
+        border-bottom: 1px solid var(--color-border);
+        background-color: var(--color-bg-light);
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-text-light);
+        z-index: 1001;
+        position: relative;
+    }
+
+    .nav-list {
+        display: flex;
+        gap: var(--spacing-lg);
+        list-style: none;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-item {
+        position: relative;
+    }
+
+    .nav-link {
+        font-family: var(--font-sans);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.5rem 0;
+        cursor: pointer;
+        color: var(--color-text-light);
+        transition: color 0.2s ease;
+        background: none;
+        border: none;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-link:hover,
+    .nav-link:focus {
+        color: var(--color-accent);
+    }
+
+    .chevron {
+        transition: transform 0.2s ease;
+    }
+
+    .has-dropdown:hover .chevron {
+        transform: rotate(180deg);
+    }
+
+    /* Dropdown Styles */
+    .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background-color: white;
+        min-width: 220px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: var(--spacing-sm) 0;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.2s ease;
+        list-style: none;
+        border: 1px solid var(--color-border);
+        z-index: 100;
+    }
+
+    .dropdown-menu::before {
+        content: "";
+        position: absolute;
+        top: -6px;
+        left: 50%;
+        transform: translateX(-50%) rotate(45deg);
+        width: 12px;
+        height: 12px;
+        background-color: white;
+        border-left: 1px solid var(--color-border);
+        border-top: 1px solid var(--color-border);
+    }
+
+    .has-dropdown:hover .dropdown-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    .dropdown-link {
+        display: block;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        color: var(--color-text-light);
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-link:hover {
+        background-color: #f8f9fa;
+        color: var(--color-accent);
+        padding-left: 1.75rem;
+    }
+
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 30px;
+        height: 21px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        z-index: 1001;
+    }
+
+    .bar {
+        width: 100%;
+        height: 3px;
+        background-color: var(--color-text-light);
+        border-radius: 3px;
+        transition: all 0.3s ease;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+        .mobile-menu-toggle {
+            display: flex;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 100%;
+            height: 100vh;
+            background-color: white;
+            padding: 80px var(--spacing-lg) var(--spacing-xl);
+            transition: right 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .nav.active {
+            right: 0;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-list {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0;
+        }
+
+        .nav-item {
+            width: 100%;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .nav-item.has-dropdown {
+            border-bottom: none;
+        }
+
+        .nav-link {
+            width: 100%;
+            padding: 1rem 0;
+            font-size: 1.1rem;
+            justify-content: space-between;
+        }
+
+        .dropdown-menu {
+            position: static;
+            transform: none;
+            box-shadow: none;
+            border: none;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 1;
+            visibility: visible;
+            transition: max-height 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        .dropdown-menu::before {
+            display: none;
+        }
+
+        .nav-item.active .dropdown-menu {
+            max-height: 500px;
+            padding: var(--spacing-sm) 0;
+        }
+
+        .nav-item.active .chevron {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-link {
+            padding-left: var(--spacing-lg);
+        }
+
+        /* Hamburger Animation */
+        .mobile-menu-toggle.active .bar:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+
+        .mobile-menu-toggle.active .bar:nth-child(2) {
+            opacity: 0;
+        }
+
+        .mobile-menu-toggle.active .bar:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        :global(body.no-scroll) {
+            overflow: hidden;
+        }
+    }
+</style>

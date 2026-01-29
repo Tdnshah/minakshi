@@ -1,0 +1,130 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const themes = [
+    {
+        title: "Gender",
+        desc: "Women’s roles in society and health.",
+    },
+    {
+        title: "Death & Dying",
+        desc: "End-of-life care and rituals.",
+    },
+    {
+        title: "Food Systems",
+        desc: "Politics of food and nutrition.",
+    },
+    {
+        title: "Ethnomedicine",
+        desc: "Traditional healing in modern contexts.x",
+    },
+];
+---
+
+<BaseLayout title="About">
+    <section class="section about-hero">
+        <div class="container">
+            <h1 class="page-title">About Minakshi Dewan</h1>
+            <div class="bio-content">
+                <div class="bio-text">
+                    <p>
+                        Minakshi Dewan is a researcher and writer with a PhD in Social Medicine
+                        and Community Health. Her work with International development
+                        organisations explore gender, traditional healing, disability, and food
+                        systems. Her bestselling non-fiction book The Final Farewell, featured in
+                        leading Indian and international publications — has been nominated for
+                        an award by the Association for the Study of Death and Society (ASDS).
+                    </p>
+                    <p>
+                        Minakshi’s writing has appeared in The Hindu, Deccan Herald, Devex,
+                        The Indian Express and The Telegraph. She has also authored a
+                        children’s book with Pratham Books and presented her research at
+                        prestigious global forums, including the American Anthropological
+                        Association.
+                    </p>
+                    <p>
+                        Collaborating with international organisations, award-winning
+                        filmmakers, and global production houses, she works to bring powerful
+                        human stories to life.
+                    </p>
+                </div>
+                <div class="bio-image">
+                    <img
+                        src="../images/minakshidewan.png"
+                        alt="Minakshi Dewan"
+                    />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section themes">
+        <div class="container">
+            <h2 class="section-heading">Focus Areas</h2>
+            <div class="themes-grid">
+                {
+                    themes.map((theme) => (
+                        <div class="theme-card">
+                            <h3>{theme.title}</h3>
+                            <p>{theme.desc}</p>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    .page-title {
+        font-size: 2.5rem;
+        margin-bottom: var(--spacing-xl);
+        text-align: center;
+    }
+
+    .bio-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: var(--spacing-xl);
+        align-items: start;
+    }
+
+    .bio-text p {
+        margin-bottom: var(--spacing-md);
+        font-size: 1.1rem;
+    }
+
+    .bio-image img {
+        border-radius: 8px;
+    }
+
+    .themes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--spacing-lg);
+    }
+
+    .theme-card {
+        padding: var(--spacing-lg);
+        background-color: white;
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .theme-card h3 {
+        color: var(--color-accent);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    @media (max-width: 768px) {
+        .bio-content {
+            grid-template-columns: 1fr;
+        }
+
+        .bio-image {
+            order: -1;
+            margin-bottom: var(--spacing-lg);
+        }
+    }
+</style>

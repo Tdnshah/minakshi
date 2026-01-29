@@ -1,0 +1,120 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const books = await getCollection("books");
+const sortedBooks = books.sort(
+    (a, b) => b.data.releaseDate.valueOf() - a.data.releaseDate.valueOf(),
+);
+---
+
+<BaseLayout title="Books">
+    <section class="section">
+        <div class="container">
+            <h1 class="page-title">Books</h1>
+            <div class="books-grid">
+                {
+                    sortedBooks.map((book) => (
+                        <div class="book-card">
+                            <a href={`/books/${book.slug}`} class="book-cover">
+                                <img
+                                    src={book.data.coverImage}
+                                    alt={book.data.title}
+                                />
+                            </a>
+                            <div class="book-info">
+                                <h2 class="book-title">
+                                    <a href={`/books/${book.slug}`}>
+                                        {book.data.title}
+                                    </a>
+                                </h2>
+                                {book.data.subtitle && (
+                                    <p class="book-subtitle">
+                                        {book.data.subtitle}
+                                    </p>
+                                )}
+                                <p class="book-desc">
+                                    {book.data.description.slice(0, 150)}...
+                                </p>
+                                <a
+                                    href={`/books/${book.slug}`}
+                                    class="btn btn-sm"
+                                >
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    .page-title {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: var(--spacing-xl);
+    }
+
+    .book-card {
+        display: flex;
+        gap: var(--spacing-md);
+        align-items: start;
+    }
+
+    .book-cover {
+        flex: 0 0 120px;
+    }
+
+    .book-cover img {
+        width: 100%;
+        border-radius: 4px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+    }
+
+    .book-cover:hover img {
+        transform: translateY(-4px);
+    }
+
+    .book-title {
+        font-size: 1.2rem;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    .book-subtitle {
+        font-size: 0.9rem;
+        color: var(--color-accent);
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .book-desc {
+        font-size: 0.9rem;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .btn-sm {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+        .book-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .book-cover {
+            width: 150px;
+            margin-bottom: var(--spacing-md);
+        }
+    }
+</style>

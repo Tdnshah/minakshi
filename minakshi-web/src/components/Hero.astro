@@ -1,0 +1,107 @@
+---
+interface Props {
+    title: string;
+    subtitle: string;
+    image?: string;
+}
+
+const { title, subtitle, image } = Astro.props;
+---
+
+<section
+    class="hero"
+    style="background-image: url('/images/backgrounds/banyan-hero-16-9.png');"
+>
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">{title}</h1>
+            <p class="hero-subtitle">{subtitle}</p>
+            <slot />
+        </div>
+        {
+            image && (
+                <div class="hero-image">
+                    <img src={image} alt={title} />
+                </div>
+            )
+        }
+    </div>
+</section>
+
+<style>
+    .hero {
+        padding: var(--spacing-xl) 0;
+        background-color: var(--color-bg-light);
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        position: relative;
+        min-height: 600px;
+        display: flex;
+        align-items: center;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(
+            253,
+            251,
+            247,
+            0.65
+        ); /* Uniform subtle overlay to mute the tree but keep it visible */
+        z-index: 1;
+    }
+
+    .hero-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-xl);
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        margin-bottom: var(--spacing-sm);
+        color: var(--color-primary);
+        text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+    }
+
+    .hero-subtitle {
+        font-family: var(--font-sans);
+        font-size: 1.3rem;
+        color: var(--color-text-light);
+        opacity: 0.9;
+        margin-bottom: var(--spacing-lg);
+        font-weight: 500;
+    }
+
+    .hero-image img {
+        border-radius: 8px;
+        /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); */
+        transform: rotate(2deg);
+        transition: transform 0.3s ease;
+    }
+
+    .hero-image img:hover {
+        transform: rotate(0deg) scale(1.02);
+    }
+
+    @media (max-width: 768px) {
+        .hero-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .hero-image {
+            order: -1;
+            margin-bottom: var(--spacing-lg);
+        }
+    }
+</style>

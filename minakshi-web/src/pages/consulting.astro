@@ -1,0 +1,189 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const consulting = await getCollection("consulting");
+const films = await getCollection("films");
+---
+
+<BaseLayout title="Consulting & Collaborations">
+    <section class="section">
+        <div class="container">
+            <h1 class="page-title">Consulting & Collaborations</h1>
+
+            <div class="intro">
+                <p>
+                    Extensive experience in development sector consulting,
+                    focusing on gender, disability, child protection, food
+                    systems, and policy development.
+                </p>
+            </div>
+
+            <h2 class="section-heading">Development Consulting</h2>
+            <div class="consulting-grid">
+                {
+                    consulting.map((project) => (
+                        <div class="consulting-card">
+                            <h3 class="org-name">
+                                {project.data.organisation}
+                            </h3>
+                            <div class="year-badge">{project.data.year}</div>
+                            <p class="description">
+                                {project.data.description}
+                            </p>
+                            <div class="domains">
+                                {project.data.domain.map((d) => (
+                                    <span class="domain-tag">{d}</span>
+                                ))}
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+
+            <h2 class="section-heading">Film & Documentary Collaborations</h2>
+            <div class="films-list">
+                {
+                    films.map((film) => (
+                        <div class="film-card">
+                            <h3 class="film-title">{film.data.title}</h3>
+                            <div class="film-meta">
+                                <span class="collaborator">
+                                    with {film.data.collaborator}
+                                </span>
+                                {film.data.expectedRelease && (
+                                    <span class="release">
+                                        Expected: {film.data.expectedRelease}
+                                    </span>
+                                )}
+                            </div>
+                            <p class="film-description">
+                                {film.data.description}
+                            </p>
+                            {film.data.notes && (
+                                <p class="film-notes">
+                                    <em>{film.data.notes}</em>
+                                </p>
+                            )}
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    .page-title {
+        text-align: center;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .intro {
+        max-width: 800px;
+        margin: 0 auto var(--spacing-xl);
+        text-align: center;
+        font-size: 1.1rem;
+        color: #555;
+    }
+
+    .intro {
+        max-width: 800px;
+        margin: 0 auto var(--spacing-xl);
+        text-align: center;
+        font-size: 1.1rem;
+        color: #555;
+    }
+
+    .consulting-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .consulting-card {
+        padding: var(--spacing-lg);
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        position: relative;
+    }
+
+    .org-name {
+        font-size: 1.2rem;
+        margin-bottom: var(--spacing-sm);
+        color: var(--color-accent);
+    }
+
+    .year-badge {
+        position: absolute;
+        top: var(--spacing-md);
+        right: var(--spacing-md);
+        background-color: var(--color-accent);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .description {
+        margin-bottom: var(--spacing-md);
+        line-height: 1.6;
+    }
+
+    .domains {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-xs);
+    }
+
+    .domain-tag {
+        padding: 0.25rem 0.5rem;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        color: #555;
+    }
+
+    .films-list {
+        display: grid;
+        gap: var(--spacing-lg);
+    }
+
+    .film-card {
+        padding: var(--spacing-lg);
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid var(--color-accent);
+    }
+
+    .film-title {
+        font-size: 1.3rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .film-meta {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .collaborator {
+        font-weight: 600;
+    }
+
+    .film-description {
+        line-height: 1.6;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .film-notes {
+        font-size: 0.9rem;
+        color: #777;
+    }
+</style>

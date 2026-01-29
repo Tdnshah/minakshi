@@ -1,0 +1,148 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+const conferences = await getCollection("conferences");
+const sortedConferences = conferences.sort((a, b) => b.data.year - a.data.year);
+
+// Group by year
+const groupedByYear = sortedConferences.reduce(
+    (acc, conf) => {
+        const year = conf.data.year;
+        if (!acc[year]) {
+            acc[year] = [];
+        }
+        acc[year].push(conf);
+        return acc;
+    },
+    {} as Record<number, typeof conferences>,
+);
+
+const years = Object.keys(groupedByYear)
+    .map(Number)
+    .sort((a, b) => b - a);
+---
+
+<BaseLayout title="Conferences & Workshops">
+    <section class="section">
+        <div class="container">
+            <h1 class="page-title">Conferences & Workshops</h1>
+
+            {
+                years.map((year) => (
+                    <div class="year-section">
+                        <h2 class="year-title">{year}</h2>
+                        <div class="conferences-list">
+                            {groupedByYear[year].map((conf) => (
+                                <article class="conference-card">
+                                    <h3 class="conference-title">
+                                        {conf.data.title}
+                                    </h3>
+                                    <div class="conference-meta">
+                                        <span class="institution">
+                                            {conf.data.institution}
+                                        </span>
+                                        <span class="location">
+                                            {conf.data.location}
+                                        </span>
+                                    </div>
+                                    <p class="conference-abstract">
+                                        {conf.data.abstract}
+                                    </p>
+                                    {conf.data.mediaLinks &&
+                                        conf.data.mediaLinks.length > 0 && (
+                                            <div class="media-links">
+                                                {conf.data.mediaLinks.map(
+                                                    (link) => (
+                                                        <a
+                                                            href={link.url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            class="media-link"
+                                                        >
+                                                            {link.label} →
+                                                        </a>
+                                                    ),
+                                                )}
+                                            </div>
+                                        )}
+                                </article>
+                            ))}
+                        </div>
+                    </div>
+                ))
+            }
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    .page-title {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .year-section {
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .year-title {
+        font-size: 2rem;
+        color: var(--color-accent);
+        margin-bottom: var(--spacing-lg);
+        border-left: 4px solid var(--color-accent);
+        padding-left: var(--spacing-md);
+    }
+
+    .conferences-list {
+        display: grid;
+        gap: var(--spacing-lg);
+    }
+
+    .conference-card {
+        padding: var(--spacing-lg);
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        border-left: 3px solid var(--color-accent);
+    }
+
+    .conference-title {
+        font-size: 1.3rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .conference-meta {
+        display: flex;
+        gap: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .institution {
+        font-weight: 600;
+        color: var(--color-accent);
+    }
+
+    .location::before {
+        content: "📍 ";
+    }
+
+    .conference-abstract {
+        line-height: 1.6;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .media-links {
+        display: flex;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+    }
+
+    .media-link {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--color-accent);
+    }
+</style>

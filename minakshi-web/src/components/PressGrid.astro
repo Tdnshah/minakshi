@@ -1,0 +1,78 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+    items: CollectionEntry<"press">[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="press-grid">
+    {
+        items.map((item) => (
+            <div class="press-item">
+                <div class="press-meta">
+                    <span class="press-type">{item.data.type}</span>
+                    <span class="press-date">
+                        {item.data.date.toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                        })}
+                    </span>
+                </div>
+                <h3 class="press-title">
+                    <a
+                        href={item.data.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        {item.data.title}
+                    </a>
+                </h3>
+                <div class="press-outlet">
+                    Published in <strong>{item.data.outlet}</strong>
+                </div>
+            </div>
+        ))
+    }
+</div>
+
+<style>
+    .press-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: var(--spacing-md);
+    }
+
+    .press-item {
+        padding: var(--spacing-md);
+        background-color: white;
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+    }
+
+    .press-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        margin-bottom: var(--spacing-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .press-type {
+        color: var(--color-accent);
+        font-weight: 600;
+    }
+
+    .press-title {
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .press-outlet {
+        font-size: 0.9rem;
+        color: #666;
+    }
+</style>

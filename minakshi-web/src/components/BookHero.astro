@@ -1,0 +1,86 @@
+---
+interface Props {
+    title: string;
+    subtitle?: string;
+    coverImage: string;
+    description: string;
+}
+
+const { title, subtitle, coverImage, description } = Astro.props;
+---
+
+<section class="book-hero">
+    <div class="container book-hero-content">
+        <div class="book-cover">
+            <img src={coverImage} alt={`Cover of ${title}`} />
+        </div>
+        <div class="book-info">
+            <h1 class="book-title">{title}</h1>
+            {subtitle && <h2 class="book-subtitle">{subtitle}</h2>}
+            <p class="book-description">{description}</p>
+            <div class="book-actions">
+                <slot />
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .book-hero {
+        padding: var(--spacing-xl) 0;
+    }
+
+    .book-hero-content {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: var(--spacing-xl);
+        align-items: start;
+    }
+
+    .book-cover img {
+        width: 100%;
+        border-radius: 4px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .book-title {
+        font-size: 2.5rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .book-subtitle {
+        font-family: var(--font-sans);
+        font-size: 1.5rem;
+        font-weight: 400;
+        color: var(--color-accent);
+        margin-bottom: var(--spacing-md);
+    }
+
+    .book-description {
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-lg);
+        max-width: 65ch;
+    }
+
+    .book-actions {
+        display: flex;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+        .book-hero-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+
+        .book-cover {
+            max-width: 200px;
+            margin: 0 auto var(--spacing-lg);
+        }
+
+        .book-actions {
+            justify-content: center;
+        }
+    }
+</style>

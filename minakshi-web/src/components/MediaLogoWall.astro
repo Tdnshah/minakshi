@@ -1,0 +1,88 @@
+---
+const logos = [
+  {
+    name: "The Hindu",
+    src: "/images/the-hindu.png",
+  },
+  {
+    name: "Deccan Herald",
+    src: "/images/deccan-herald.png",
+  },
+  {
+    name: "The Indian Express",
+    src: "/images/indian-express.png",
+  },
+  {
+    name: "The Telegraph",
+    src: "/images/the-telegraph.png",
+  },
+  {
+    name: "Devex",
+    src: "/images/devex.png",
+  }
+];
+---
+
+<section class="media-logos">
+  <div class="container">
+    <h3 class="section-heading">Featured In</h3>
+    <div class="logo-wall">
+      {
+        logos.map((logo) => (
+          <div class="logo-item">
+            <img src={logo.src} alt={logo.name} class="logo-img" />
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .media-logos {
+    padding: var(--spacing-lg) 0;
+    background: transparent;
+  }
+
+  .logo-wall {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-lg) 0;
+  }
+
+  .logo-item {
+    opacity: 0.6;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+    filter: grayscale(100%);
+    display: flex; /* Centers images in their container */
+    align-items: center;
+    padding: 0 var(--spacing-md); /* Add some horizontal breathing room */
+  }
+
+  .logo-img {
+    height: 120px; 
+    width: auto;
+    object-fit: contain;
+    max-width: 300px;
+  }
+
+  @media (max-width: 768px) {
+    .logo-wall {
+      gap: var(--spacing-lg);
+    }
+
+    .logo-item {
+        padding: 0 var(--spacing-sm);
+    }
+
+    .logo-img {
+      height: 80px;
+      max-width: 200px;
+    }
+  }
+</style>

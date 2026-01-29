@@ -1,0 +1,211 @@
+---
+interface MediaItem {
+    title: string;
+    url: string;
+    type?: string;
+}
+
+interface Props {
+    mediaCoverage: MediaItem[];
+}
+
+const { mediaCoverage } = Astro.props;
+
+// Helper to get logo/publication name
+function getPublicationInfo(title: string) {
+    // Try to extract publication from parentheses, e.g., "Title (Publication)"
+    const match = title.match(/\((.*?)\)/);
+    const publication = match ? match[1] : "Media Coverage";
+
+    // Generate a placeholder logo with the publication name
+    // Using a deterministic color based on the name length to add variety
+    const colors = ["2E7D8C", "D4A574", "8B5A8E", "E07A5F", "6A994E"];
+    const colorIndex = publication.length % colors.length;
+    const color = colors[colorIndex];
+
+    const logoUrl = `https://placehold.co/200x60/${color}/FFFFFF?text=${encodeURIComponent(publication)}`;
+
+    // Clean title by removing the publication part
+    const cleanTitle = title.replace(/\s*\(.*?\)\s*/, "").trim();
+
+    return { publication, logoUrl, cleanTitle };
+}
+
+// Process items to add logo info
+const processedMedia = mediaCoverage.map((item) => ({
+    ...item,
+    ...getPublicationInfo(item.title),
+}));
+
+// Duplicate for seamless loop
+const duplicatedMedia = [...processedMedia, ...processedMedia];
+---
+
+<section class="media-scroll-section">
+    <div class="container">
+        <h3 class="section-heading">Media Coverage</h3>
+        <div class="carousel-container">
+            <div class="carousel-track">
+                {
+                    duplicatedMedia.map((item) => (
+                        <div class="media-card">
+                            <div class="media-logo">
+                                <img
+                                    src={item.logoUrl}
+                                    alt={item.publication}
+                                />
+                            </div>
+                            <div class="media-content">
+                                <h4 class="media-title">{item.cleanTitle}</h4>
+                                <div class="media-meta">
+                                    {item.type && (
+                                        <span class="media-type">
+                                            {item.type}
+                                        </span>
+                                    )}
+                                </div>
+                                <a
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="media-link"
+                                >
+                                    Read Article →
+                                </a>
+                            </div>
+                        </div>
+                    ))
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .media-scroll-section {
+        padding: var(--spacing-xl) 0;
+        background-color: #f8f9fa;
+        overflow: hidden;
+    }
+
+    .media-scroll-section {
+        padding: var(--spacing-xl) 0;
+        background-color: #f8f9fa;
+        overflow: hidden;
+    }
+
+    .carousel-container {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        padding: var(--spacing-md) 0;
+        mask-image: linear-gradient(
+            to right,
+            transparent,
+            black 10%,
+            black 90%,
+            transparent
+        );
+    }
+
+    .carousel-track {
+        display: flex;
+        gap: var(--spacing-lg);
+        width: max-content;
+        animation: scroll 40s linear infinite;
+    }
+
+    .carousel-track:hover {
+        animation-play-state: paused;
+    }
+
+    .media-card {
+        flex: 0 0 300px;
+        background: white;
+        border-radius: 12px;
+        padding: var(--spacing-lg);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .media-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .media-logo {
+        height: 50px;
+        margin-bottom: var(--spacing-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .media-logo img {
+        max-height: 100%;
+        max-width: 100%;
+        object-fit: contain;
+    }
+
+    .media-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .media-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: var(--spacing-sm);
+        line-height: 1.4;
+        color: var(--color-text-light);
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .media-meta {
+        margin-bottom: var(--spacing-md);
+        margin-top: auto;
+    }
+
+    .media-type {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #888;
+        background: #f0f0f0;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    .media-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--color-accent);
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: gap 0.2s ease;
+    }
+
+    .media-link:hover {
+        gap: 0.8rem;
+    }
+
+    @keyframes scroll {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+</style>
