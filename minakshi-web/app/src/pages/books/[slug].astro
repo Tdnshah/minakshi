@@ -1,0 +1,116 @@
+---
+import { getCollection } from "astro:content";
+import BookLayout from "../../layouts/BookLayout.astro";
+import BookHero from "../../components/BookHero.astro";
+import BuyButton from "../../components/BuyButton.astro";
+import ReviewSlider from "../../components/ReviewSlider.astro";
+import EventGallery from "../../components/EventGallery.astro";
+import RequestCopyForm from "../../components/RequestCopyForm.astro";
+import BookMediaScroll from "../../components/BookMediaScroll.astro";
+
+export async function getStaticPaths() {
+    const books = await getCollection("books");
+    return books.map((book) => ({
+        params: { slug: book.slug },
+        props: { book },
+    }));
+}
+
+const { book } = Astro.props;
+const { Content } = await book.render();
+---
+
+<BookLayout title={book.data.title} description={book.data.description}>
+    <BookHero
+        title={book.data.title}
+        subtitle={book.data.subtitle}
+        coverImage={book.data.coverImage}
+        description={book.data.description}
+    >
+        {
+            book.data.buyLinks?.map((link) => (
+                <BuyButton href={link.url} label={`Buy on ${link.store}`} />
+            ))
+        }
+        <!-- {
+            book.data.bookKits?.map((kit) => (
+                <BuyButton
+                    href={kit.url}
+                    label={`Download ${kit.label}`}
+                    variant="secondary"
+                />
+            ))
+        } -->
+    </BookHero>
+
+    <section class="section book-content">
+        <div class="container">
+            <div class="content-wrapper">
+                <Content />
+            </div>
+        </div>
+    </section>
+
+    { book.data.reviews?.length > 0 && (
+        <ReviewSlider reviews={book.data.reviews} />
+        )}
+
+    {
+        book.data.mediaCoverage?.length > 0 && (
+            <BookMediaScroll mediaCoverage={book.data.mediaCoverage} />
+        )
+    }
+
+    {book.data.eventGallery?.length > 0 && <EventGallery images={book.data.eventGallery} />}
+</BookLayout>
+
+<style>
+    .content-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        font-size: 1.1rem;
+        line-height: 1.8;
+    }
+
+    .content-wrapper :global(h2) {
+        margin-top: var(--spacing-xl);
+        font-size: 1.8rem;
+    }
+
+    .content-wrapper :global(p) {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .media-coverage {
+        background-color: var(--color-bg-light);
+    }
+
+    .section-heading {
+        text-align: center;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .coverage-list {
+        list-style: none;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .coverage-list li {
+        margin-bottom: var(--spacing-sm);
+        padding-bottom: var(--spacing-sm);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .coverage-list a {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .coverage-type {
+        font-size: 0.85rem;
+        color: var(--color-accent);
+        text-transform: uppercase;
+    }
+</style>

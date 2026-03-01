@@ -1,0 +1,92 @@
+---
+import vogue from "../../public/images/vogue.png";
+import devex from "../../public/images/devex.png";
+import indianExpress from "../../public/images/indian-express.png";
+import theHindu from "../../public/images/the-hindu.png";
+import theTelegraph from "../../public/images/the-telegraph.png";
+import deccanHerald from "../../public/images/deccan-herald.png";
+
+const CompanyLogoData = [
+  { src: vogue, alt: "Vogue Logo" },
+  { src: devex, alt: "Devex Logo" },
+  { src: indianExpress, alt: "Indian Express Logo" },
+  { src: theHindu, alt: "The Hindu Logo" },
+  { src: theTelegraph, alt: "The Telegraph Logo" },
+  { src: deccanHerald, alt: "DeccanHerald Logo" },
+];
+---
+
+<div class="container p-5">
+<h3 class="section-heading p-5">Featured In</h3>
+  <div class="logo-wrapper">
+    <div class="logo-track">
+      <!-- duplicate twice so it loops seamlessly -->
+      {Array.from({ length: 2 }).map(() => (
+        <>
+          {CompanyLogoData.map(({ src, alt }) => (
+            <img src={src.src} alt={alt} class="logo" loading="lazy" />
+          ))}
+        </>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .logo-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: flex;  
+    padding: var(--spacing-lg) 0;
+    background: transparent;
+  }
+
+  /* fade edges like your before/after gradient */
+  .logo-wrapper::before,
+  .logo-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 40px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .logo-wrapper::before {
+    left: 0;
+    background: linear-gradient(to right, rgb(255, 255, 255), transparent);
+  }
+
+  .logo-wrapper::after {
+    right: 0;
+    background: linear-gradient(to left, rgb(255, 255, 255), transparent);
+  }
+
+  .logo-track {
+    display: flex;
+    flex: none;
+    gap: 64px;
+    padding-right: 64px;
+    animation: scroll 10s linear infinite;
+  }
+
+  .logo {
+    height: 64px;
+    width: auto;
+    flex: none;
+    opacity: 0.6;
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+    filter: grayscale(100%);
+  }
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+</style>
