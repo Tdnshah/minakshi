@@ -5,7 +5,9 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
   },
-  auth: true,
+  auth: {
+    useAPIKey: true, // This enables API key generation in the Admin UI
+  },
   fields: [
     // Email added by default
     // Add more fields as needed
