@@ -1,0 +1,183 @@
+---
+interface HeroAction {
+    href: string;
+    label: string;
+    variant?: "primary" | "ghost";
+}
+
+interface Props {
+    eyebrow: string;
+    firstName: string;
+    lastName: string;
+    description: string;
+    roles: string[];
+    portraitSrc: string;
+    portraitAlt: string;
+    portraitCaption?: string;
+    actions?: HeroAction[];
+}
+
+const {
+    eyebrow,
+    firstName,
+    lastName,
+    description,
+    roles,
+    portraitSrc,
+    portraitAlt,
+    portraitCaption = "Minakshi Dewan, Delhi",
+    actions = [],
+} = Astro.props;
+---
+
+<header class="hero">
+    <div class="container hero-grid">
+        <div class="hero-text">
+            <p class="eyebrow">{eyebrow}</p>
+            <h1 class="hero-name">
+                {firstName}
+                <em>{lastName}</em>
+            </h1>
+            <p class="hero-desc">{description}</p>
+            {actions.length > 0 && (
+                <div class="hero-actions">
+                    {actions.map((action) => (
+                        <a
+                            href={action.href}
+                            class={`btn ${action.variant === "ghost" ? "btn-ghost" : "btn-primary"}`}
+                        >
+                            {action.label}
+                        </a>
+                    ))}
+                </div>
+            )}
+            <div class="hero-role">
+                {roles.map((role) => <span>{role}</span>)}
+            </div>
+        </div>
+        <div class="hero-portrait" data-caption={portraitCaption}>
+            <img src={portraitSrc} alt={portraitAlt} loading="eager" />
+        </div>
+    </div>
+</header>
+
+<style>
+    .hero {
+        padding: 5rem 0 3.25rem;
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .hero-grid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 3.25rem;
+        align-items: end;
+    }
+
+    .hero-text {
+        padding-bottom: 1.25rem;
+    }
+
+    .hero-name {
+        font-family: var(--font-display);
+        font-weight: 600;
+        font-size: clamp(3rem, 9vw, 8.5rem);
+        line-height: 0.92;
+        letter-spacing: -0.035em;
+        margin: 1.25rem 0 1.5rem;
+        color: var(--ink);
+        font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
+    }
+
+    .hero-name em {
+        display: block;
+        font-style: italic;
+        color: var(--accent);
+        font-weight: 500;
+        font-variation-settings: "opsz" 144, "SOFT" 80, "WONK" 1;
+    }
+
+    .hero-desc {
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: clamp(1.25rem, 2.2vw, 1.875rem);
+        line-height: 1.32;
+        letter-spacing: -0.015em;
+        color: var(--ink-mid);
+        max-width: 30ch;
+        font-variation-settings: "opsz" 36, "SOFT" 40;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 0.875rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-role {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.25rem;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+        padding-top: 1.25rem;
+        margin-top: 1.25rem;
+        border-top: 1px solid var(--rule-soft);
+    }
+
+    .hero-role span {
+        position: relative;
+    }
+
+    .hero-role span + span::before {
+        content: "·";
+        position: absolute;
+        left: -0.85rem;
+        color: var(--accent);
+    }
+
+    .hero-portrait {
+        position: relative;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+        background: var(--paper-deep);
+        border: 1px solid var(--ink);
+    }
+
+    .hero-portrait img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        filter: grayscale(15%) contrast(1.02);
+    }
+
+    .hero-portrait[data-caption]::after {
+        content: attr(data-caption);
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0.6rem 1rem;
+        background: var(--ink);
+        color: var(--paper);
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+        .hero-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-portrait {
+            max-width: 320px;
+        }
+    }
+</style>

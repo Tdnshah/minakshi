@@ -1,0 +1,44 @@
+---
+interface PublicEngagement {
+    date: string;
+    title: string;
+    description: string;
+    imageSrc: string;
+    imageAlt?: string;
+}
+
+interface Props {
+    sectionTitle: string;
+    events: PublicEngagement[];
+}
+
+const { sectionTitle, events } = Astro.props;
+---
+
+<section class="py-24 px-12 bg-surface">
+    <div class="max-w-screen-2xl mx-auto">
+        <h2 class="text-4xl font-headline text-primary mb-12">{sectionTitle}</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {events.map((event) => (
+                <div class="relative group overflow-hidden rounded-xl h-[400px]">
+                    <img
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        src={event.imageSrc}
+                        alt={event.imageAlt ?? event.title}
+                        loading="lazy"
+                    />
+                    <div class="absolute inset-0 bg-gradient-to-t from-primary/90 to-transparent flex flex-col justify-end p-8">
+                        <span class="text-secondary font-label text-xs uppercase tracking-widest mb-2">
+                            {event.date}
+                        </span>
+                        <h3 class="text-white text-2xl font-headline">{event.title}</h3>
+                        <p class="text-white/70 text-sm mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {event.description}
+                        </p>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>

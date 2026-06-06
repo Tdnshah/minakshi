@@ -3,6 +3,11 @@ import { CollectionConfig } from 'payload';
 export const Press: CollectionConfig = {
   slug: 'press',
   admin: { useAsTitle: 'title' },
+  access: {
+    read: ({ req }) => {
+      return !!req.user;   // allow only API key requests
+    },
+  },
   fields: [
     { name: 'title', type: 'text', required: true },
     {

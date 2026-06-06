@@ -1,0 +1,186 @@
+---
+interface Props {
+    eyebrow: string;
+    title: string;
+    titleItalicPart?: string;
+    description: string;
+    ctaPrimaryLabel: string;
+    ctaPrimaryHref?: string;
+    ctaSecondaryLabel: string;
+    ctaSecondaryIcon?: string;
+    ctaSecondaryHref?: string;
+    bookCoverSrc: string;
+    bookCoverAlt?: string;
+    decorativeBgSrc?: string;
+    decorativeBgAlt?: string;
+}
+
+const {
+    eyebrow,
+    title,
+    titleItalicPart,
+    description,
+    ctaPrimaryLabel,
+    ctaPrimaryHref = '#',
+    ctaSecondaryLabel,
+    ctaSecondaryIcon = 'play_circle',
+    ctaSecondaryHref = '#',
+    bookCoverSrc,
+    bookCoverAlt = 'Book cover',
+    decorativeBgSrc,
+    decorativeBgAlt = 'Decorative background illustration',
+} = Astro.props;
+---
+
+<section class="relative pt-28 pb-20 px-12 min-h-[90vh] flex items-center overflow-hidden border-b border-ink bg-paper">
+    {decorativeBgSrc && (
+        <div class="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none">
+            <img class="w-full h-full object-cover" src={decorativeBgSrc} alt={decorativeBgAlt} style="filter: grayscale(100%);" />
+        </div>
+    )}
+
+    <div class="max-w-shell mx-auto w-full asymmetric-grid">
+        <!-- Text column -->
+        <div class="col-span-12 md:col-span-7 flex flex-col justify-center">
+            <span class="book-eyebrow">
+                {eyebrow}
+            </span>
+
+            <h1 class="book-page-title">
+                {titleItalicPart
+                    ? (
+                        <>
+                            {title}<br /><em class="text-accent">{titleItalicPart}</em>
+                        </>
+                    )
+                    : title
+                }
+            </h1>
+
+            <p class="book-page-lead">
+                {description}
+            </p>
+
+            <div class="flex flex-wrap gap-4 items-center">
+                <a href={ctaPrimaryHref} class="btn-primary">
+                    {ctaPrimaryLabel}
+                </a>
+                <a href={ctaSecondaryHref} class="btn-secondary-link">
+                    {ctaSecondaryLabel} →
+                </a>
+            </div>
+        </div>
+
+        <!-- Cover image column -->
+        <div class="col-span-12 md:col-span-5 relative">
+            <div class="cover-frame">
+                <img
+                    class="w-full h-auto"
+                    src={bookCoverSrc}
+                    alt={bookCoverAlt}
+                />
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .asymmetric-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 1.5rem;
+    }
+
+    .book-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+    }
+
+    .book-eyebrow::before {
+        content: '';
+        display: inline-block;
+        width: 1.5rem;
+        height: 1px;
+        background: var(--accent);
+    }
+
+    .book-page-title {
+        font-family: var(--font-display);
+        font-size: clamp(3rem, 7vw, 7rem);
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 0.94;
+        letter-spacing: -0.035em;
+        font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
+        margin-bottom: 2rem;
+    }
+
+    .book-page-title em {
+        font-style: italic;
+        display: block;
+        color: var(--accent);
+        font-variation-settings: "opsz" 144, "SOFT" 80, "WONK" 1;
+    }
+
+    .book-page-lead {
+        font-family: var(--font-display);
+        font-size: clamp(1.125rem, 2vw, 1.5rem);
+        font-weight: 400;
+        color: var(--ink-mid);
+        max-width: 48ch;
+        line-height: 1.45;
+        letter-spacing: -0.01em;
+        font-variation-settings: "opsz" 24, "SOFT" 50;
+        margin-bottom: 2.5rem;
+    }
+
+    .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        font-family: var(--font-body);
+        font-size: 0.9375rem;
+        font-weight: 500;
+        padding: 0.875rem 1.75rem;
+        border: 1px solid var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+        transition: background 0.18s var(--ease-editorial), border-color 0.18s var(--ease-editorial);
+    }
+
+    .btn-primary:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: var(--paper);
+    }
+
+    .btn-secondary-link {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--ink-mid);
+        transition: color 0.15s var(--ease-editorial);
+    }
+
+    .btn-secondary-link:hover {
+        color: var(--ink);
+    }
+
+    .cover-frame {
+        display: inline-block;
+        box-shadow: 12px 12px 0 -1px var(--accent), 12px 12px 0 0 var(--ink);
+        transition: transform 0.5s var(--ease-editorial);
+    }
+
+    .cover-frame:hover {
+        transform: translate(-3px, -3px);
+    }
+</style>

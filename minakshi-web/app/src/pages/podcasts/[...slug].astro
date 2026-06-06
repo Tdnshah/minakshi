@@ -1,17 +1,28 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import { fetchPodcasts } from "../../lib/payload/podcasts";
+export const prerender = false;
 
-export async function getStaticPaths() {
-    const podcasts = await getCollection("podcasts");
-    return podcasts.map((entry) => ({
-        params: { slug: entry.id },
-        props: { entry },
-    }));
-}
+const podcastId=Astro.params.slug
 
-const { entry } = Astro.props;
-const { title, description, url, platform, publishedAt } = entry.data;
+const podcasts = await fetchPodcasts(podcastId);
+
+
+// import { getCollection } from "astro:content";
+
+// export async function getStaticPaths() {
+//     const podcasts = await getCollection("podcasts");
+//     return podcasts.map((entry) => ({
+//         params: { slug: entry.id },
+//         props: { entry },
+//     }));
+// }
+
+// const { entry } = Astro.props;
+console.log(podcasts.publishedAt);
+const { title, description, url, platform, publishedAt } = podcasts;
+// Convert the string to a Date object
+const publishedDate = new Date(publishedAt);
 
 const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat("en-US", {
@@ -58,8 +69,8 @@ const embedUrl = getEmbedUrl(url, platform);
                 <header class="podcast-header">
                     <div class="meta-top">
                         <span class="platform-badge">{platform}</span>
-                        <time datetime={publishedAt.toISOString()}>
-                            {formatDate(publishedAt)}
+                        <time datetime={publishedDate.toISOString()}>
+                            {formatDate(publishedDate)}
                         </time>
                     </div>
                     <h1 class="podcast-title">{title}</h1>

@@ -8,7 +8,7 @@ managing the deceased and laying them to rest? What are the economic
 and environmental costs of saying that final goodbye? Powerful and
 enlightening, The Final Farewell offers a glimpse into a world that is
 misunderstood and feared."
-coverImage: "../../images/books/final-farewell/final-farewell.jpg"
+coverImage: "/images/books/final-farewell/final-farewell.jpg"
 isbn: "978-93-5699-123-4"
 publisher: "HarperCollins India"
 releaseDate: 2023-08-20
@@ -113,10 +113,10 @@ mediaCoverage:
     type: "Book Review"
     date: 2024-06-03
 eventGallery:
-  - "../images/books/final-farewell/events/Book Talk (1).jpg"
-  - "../images/books/final-farewell/Book Sales.jpg"
-  - "../images/books/final-farewell/Book Stores.jpg"
-  - "../images/books/final-farewell/events/Kunzum Book Signing.jpg"
+  - "/images/books/final-farewell/events/Book Talk (1).jpg"
+  - "/images/books/final-farewell/Book Sales.jpg"
+  - "/images/books/final-farewell/Book Stores.jpg"
+  - "/images/books/final-farewell/events/Kunzum Book Signing.jpg"
 bookKits:
   - label: "Press Kit"
     url: "/downloads/press-kit.pdf"

@@ -1,5 +1,5 @@
 import { defineCollection, z } from 'astro:content';
-
+import { payloadApiContentLoader } from '../loaders/payloadLoader';
 // const blogs = defineCollection({
 //     type: 'content',
 //     schema: z.object({
@@ -122,16 +122,20 @@ const consulting = defineCollection({
 });
 
 const articles = defineCollection({
-    type: 'data',
-    schema: z.object({
-        title: z.string(),
-        platform: z.string(),
-        url: z.string().url(),
-        date: z.coerce.date(),
-        excerpt: z.string(),
-        image: z.string().optional(),
-        tags: z.array(z.string()).optional(),
-    }),
+  schema: z.object({
+    title: z.string(),
+    platform: z.string(),
+    url: z.string(),
+    date: z.string(),
+    excerpt: z.string(),
+    image: z.string().optional(),
+    tags: z.array(
+      z.object({
+        id: z.string(),
+        tag: z.string(),
+      })
+    ),
+  }),
 });
 
 export const collections = {

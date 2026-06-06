@@ -10,146 +10,228 @@ interface Props {
 }
 
 const { reviews } = Astro.props;
+
+const [featured, ...rest] = reviews;
+
+const accentGradients = [
+    'var(--gradient-primary)',
+    'var(--gradient-sunset)',
+    'var(--gradient-warm)',
+    'var(--gradient-purple)',
+    'var(--gradient-primary)',
+];
 ---
 
 <section class="reviews">
     <div class="container">
-        <h2 class="section-heading">Praise</h2>
-        <div class="reviews-grid">
-            {
-                reviews.map((review) => (
-                    <blockquote class="review-card">
-                        <p class="review-quote">"{review.quote}"</p>
-                        <footer class="review-author">
-                            — <strong>{review.author}</strong>
-                        </footer>
-                        {review.source && (
-                            <a
-                                href={review.source}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="read-more"
-                            >
-                                Read more →
-                            </a>
-                        )}
-                    </blockquote>
-                ))
-            }
+        <div class="section-header">
+            <h2 class="section-title">Praise for the Book</h2>
+            <div class="section-rule"></div>
         </div>
+
+        <!-- Featured quote -->
+        {featured && (
+            <blockquote class="featured-review">
+                <span class="ornament">&ldquo;</span>
+                <p class="featured-quote">{featured.quote}</p>
+                <footer class="featured-footer">
+                    <strong class="featured-author">{featured.author}</strong>
+                    {featured.source && (
+                        <a href={featured.source} target="_blank" rel="noopener noreferrer" class="featured-source">
+                            Read full review ↗
+                        </a>
+                    )}
+                </footer>
+            </blockquote>
+        )}
+
+        <!-- Remaining reviews grid -->
+        {rest.length > 0 && (
+            <div class="reviews-grid">
+                {rest.map((review, i) => (
+                    <blockquote class="review-card" style={`--accent: ${accentGradients[i % accentGradients.length]}`}>
+                        <span class="card-quote-mark">&ldquo;</span>
+                        <p class="card-quote">{review.quote}</p>
+                        <footer class="card-footer">
+                            <span class="card-author">— {review.author}</span>
+                            {review.source && (
+                                <a href={review.source} target="_blank" rel="noopener noreferrer" class="card-link">
+                                    Read ↗
+                                </a>
+                            )}
+                        </footer>
+                    </blockquote>
+                ))}
+            </div>
+        )}
     </div>
 </section>
 
 <style>
     .reviews {
         padding: var(--spacing-xl) 0;
-        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+        background: #fff;
     }
 
-    .reviews {
-        padding: var(--spacing-xl) 0;
-        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+    .section-header {
+        text-align: center;
+        margin-bottom: var(--spacing-xl);
     }
 
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .section-rule {
+        width: 60px;
+        height: 3px;
+        background: var(--gradient-sunset);
+        border-radius: 2px;
+        margin: 0 auto;
+    }
+
+    /* Featured quote */
+    .featured-review {
+        position: relative;
+        background: linear-gradient(135deg, #f9f7f4 0%, #f0ebe3 100%);
+        border-left: 4px solid var(--color-primary);
+        border-radius: 0 16px 16px 0;
+        padding: var(--spacing-xl) var(--spacing-xl) var(--spacing-lg);
+        margin-bottom: var(--spacing-xl);
+        overflow: hidden;
+    }
+
+    .ornament {
+        position: absolute;
+        top: -20px;
+        left: 20px;
+        font-size: 8rem;
+        font-family: Georgia, serif;
+        color: var(--color-primary);
+        opacity: 0.08;
+        line-height: 1;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    .featured-quote {
+        font-family: var(--font-serif);
+        font-size: clamp(1.15rem, 2.5vw, 1.4rem);
+        font-style: italic;
+        line-height: 1.8;
+        color: var(--color-text-light);
+        position: relative;
+        z-index: 1;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .featured-footer {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        flex-wrap: wrap;
+    }
+
+    .featured-author {
+        font-family: var(--font-sans);
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        letter-spacing: 0.02em;
+    }
+
+    .featured-source {
+        font-size: 0.875rem;
+        color: var(--color-accent);
+        font-weight: 600;
+        text-decoration: none;
+        transition: opacity 0.2s;
+    }
+
+    .featured-source:hover {
+        opacity: 0.75;
+    }
+
+    /* Grid cards */
     .reviews-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: var(--spacing-lg);
     }
 
     .review-card {
-        padding: var(--spacing-lg);
         background: white;
-        border-radius: 16px;
+        border-radius: 12px;
+        padding: var(--spacing-lg);
         box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-border);
         position: relative;
         overflow: hidden;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        display: flex;
+        flex-direction: column;
     }
 
     .review-card::before {
-        content: "";
+        content: '';
         position: absolute;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 4px;
-        background: var(--gradient-sunset);
-    }
-
-    .review-card:nth-child(2)::before {
-        background: var(--gradient-primary);
-    }
-
-    .review-card:nth-child(3)::before {
-        background: var(--gradient-warm);
-    }
-
-    .review-card:nth-child(4)::before {
-        background: var(--gradient-purple);
-    }
-
-    .review-card:nth-child(5)::before {
-        background: var(--gradient-sunset);
+        right: 0;
+        height: 3px;
+        background: var(--accent);
     }
 
     .review-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
     }
 
-    .review-quote {
-        font-family: var(--font-serif);
-        font-size: 1.1rem;
-        font-style: italic;
-        margin-bottom: var(--spacing-md);
-        color: var(--color-text-light);
-        line-height: 1.7;
-        position: relative;
-        padding-left: var(--spacing-md);
-    }
-
-    .review-quote::before {
-        content: '"';
-        position: absolute;
-        left: -5px;
-        top: -10px;
-        font-size: 4rem;
-        color: var(--color-accent);
-        opacity: 0.2;
+    .card-quote-mark {
+        font-size: 3.5rem;
         font-family: Georgia, serif;
-    }
-
-    .review-author {
-        font-size: 0.95rem;
-        color: var(--color-text-light);
-        font-weight: 600;
+        color: var(--color-border);
+        line-height: 0.8;
+        display: block;
         margin-bottom: var(--spacing-sm);
     }
 
-    .read-more {
-        display: inline-flex;
+    .card-quote {
+        font-family: var(--font-serif);
+        font-style: italic;
+        font-size: 0.975rem;
+        line-height: 1.75;
+        color: var(--color-text-light);
+        flex: 1;
+        margin-bottom: var(--spacing-md);
+    }
+
+    .card-footer {
+        display: flex;
         align-items: center;
-        gap: 0.5rem;
-        margin-top: var(--spacing-sm);
-        font-size: 0.9rem;
+        justify-content: space-between;
+        gap: var(--spacing-sm);
+        flex-wrap: wrap;
+        padding-top: var(--spacing-sm);
+        border-top: 1px solid var(--color-border);
+    }
+
+    .card-author {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--color-text-light);
+    }
+
+    .card-link {
+        font-size: 0.8rem;
         font-weight: 600;
         color: var(--color-primary);
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: color 0.2s;
     }
 
-    .read-more::after {
-        content: "→";
-        transition: transform 0.2s ease;
-    }
-
-    .read-more:hover {
+    .card-link:hover {
         color: var(--color-accent);
-    }
-
-    .read-more:hover::after {
-        transform: translateX(4px);
     }
 </style>

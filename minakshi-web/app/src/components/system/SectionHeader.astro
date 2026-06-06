@@ -1,0 +1,113 @@
+---
+interface Props {
+    eyebrow?: string;
+    title: string;
+    italicPart?: string;
+    description?: string;
+    actionLabel?: string;
+    actionHref?: string;
+}
+
+const { eyebrow, title, italicPart, description, actionLabel, actionHref } =
+    Astro.props;
+---
+
+<header class="section-head">
+    <div class="section-meta">
+        {eyebrow && <p class="section-eyebrow">{eyebrow}</p>}
+        {actionLabel && actionHref && (
+            <a class="section-action" href={actionHref}>{actionLabel} →</a>
+        )}
+    </div>
+    <div>
+        <h2 class="section-title">
+            {title}{" "}
+            {italicPart && (
+                <em class="section-italic">{italicPart}</em>
+            )}
+        </h2>
+        {description && <p class="section-description">{description}</p>}
+    </div>
+</header>
+
+<style>
+    .section-head {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+        align-items: end;
+        padding-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .section-meta {
+        padding-bottom: 0.25rem;
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .section-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--accent);
+    }
+
+    .section-eyebrow::before {
+        content: "";
+        width: 1.5rem;
+        height: 1px;
+        background: var(--accent);
+    }
+
+    .section-action {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--ink-mid);
+        transition: color 150ms var(--ease-editorial);
+    }
+
+    .section-action:hover {
+        color: var(--ink);
+    }
+
+    .section-title {
+        font-family: var(--font-display);
+        font-size: clamp(2rem, 4.6vw, 4rem);
+        font-weight: 500;
+        letter-spacing: -0.02em;
+        line-height: 1.04;
+        color: var(--ink);
+        font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
+    }
+
+    .section-italic {
+        font-style: italic;
+        color: var(--accent);
+        font-variation-settings: "opsz" 144, "SOFT" 80, "WONK" 1;
+    }
+
+    .section-description {
+        margin-top: 0.75rem;
+        max-width: 56ch;
+        font-family: var(--font-display);
+        font-size: 1.125rem;
+        line-height: 1.45;
+        color: var(--ink-mid);
+        font-variation-settings: "opsz" 24, "SOFT" 50;
+    }
+
+    @media (max-width: 760px) {
+        .section-head {
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+    }
+</style>

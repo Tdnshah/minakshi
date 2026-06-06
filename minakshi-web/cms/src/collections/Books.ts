@@ -3,15 +3,26 @@ import { CollectionConfig } from 'payload';
 export const Books: CollectionConfig = {
   slug: 'books',
   admin: { useAsTitle: 'title' },
+  access: {
+    read: ({ req }) => {
+      return !!req.user;   // allow only API key requests
+    },
+  },
   fields: [
     { name: 'title', type: 'text', required: true },
     { name: 'subtitle', type: 'text' },
+    {
+      name: 'excerpt',
+      type: 'textarea',
+      admin: {
+        description: 'Short blurb shown in the hero section and book listings (2–4 sentences).',
+      },
+    },
     { name: 'description', type: 'richText', required: true },
     { name: 'coverImage', type: 'upload', relationTo: 'media', required: true },
     { name: 'isbn', type: 'text' },
     { name: 'publisher', type: 'text', required: true },
     { name: 'releaseDate', type: 'date', required: true },
-
     {
       name: 'buyLinks',
       type: 'array',
@@ -20,7 +31,30 @@ export const Books: CollectionConfig = {
         { name: 'url', type: 'text', required: true },
       ],
     },
-
+    {
+      name: 'awards',
+      type: 'array',
+      admin: {
+        description: 'Awards, shortlists, and recognitions the book has received.',
+      },
+      fields: [
+        { name: 'title', type: 'text', required: true },
+        { name: 'organization', type: 'text', required: true },
+        { name: 'year', type: 'number' },
+        {
+          name: 'status',
+          type: 'select',
+          defaultValue: 'shortlisted',
+          options: [
+            { label: 'Winner', value: 'winner' },
+            { label: 'Shortlisted', value: 'shortlisted' },
+            { label: 'Longlisted', value: 'longlisted' },
+            { label: 'Nominated', value: 'nominated' },
+          ],
+        },
+        { name: 'url', type: 'text', admin: { description: 'Link for more info (optional).' } },
+      ],
+    },
     {
       name: 'reviews',
       type: 'array',
@@ -30,7 +64,6 @@ export const Books: CollectionConfig = {
         { name: 'source', type: 'text' },
       ],
     },
-
     {
       name: 'mediaCoverage',
       type: 'array',
@@ -42,7 +75,21 @@ export const Books: CollectionConfig = {
         { name: 'date', type: 'date', required: true },
       ],
     },
-
+    {
+      name: 'bookEvents',
+      type: 'array',
+      admin: {
+        description: 'Book talks, signings, launches, and other events.',
+      },
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        { name: 'date', type: 'date', required: true },
+        { name: 'venue', type: 'text' },
+        { name: 'city', type: 'text' },
+        { name: 'description', type: 'textarea' },
+        { name: 'url', type: 'text', admin: { description: 'Optional link to event page or recording.' } },
+      ],
+    },
     {
       name: 'eventGallery',
       type: 'array',
@@ -52,15 +99,11 @@ export const Books: CollectionConfig = {
           type: 'upload',
           relationTo: 'media',
         },
-      ],
-    },
-
-    {
-      name: 'bookKits',
-      type: 'array',
-      fields: [
-        { name: 'label', type: 'text', required: true },
-        { name: 'url', type: 'text', required: true },
+        {
+          name: 'caption',
+          type: 'text',
+          admin: { description: 'Optional caption for this photo.' },
+        },
       ],
     },
   ],

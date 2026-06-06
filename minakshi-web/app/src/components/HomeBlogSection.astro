@@ -1,7 +1,8 @@
 ---
-import { getCollection } from "astro:content";
+import { fetchArticles } from "../lib/payload/articles";
+export const prerender = false;
 
-const articles = await getCollection("articles");
+const articles = await fetchArticles();
 
 // Define a unified interface for the combined content
 interface UnifiedContent {
@@ -20,12 +21,12 @@ interface UnifiedContent {
 const allContent: UnifiedContent[] = [
     ...articles.map((item) => ({
         type: "blog" as const,
-        title: item.data.title,
-        date: item.data.date,
-        url: item.data.url,
-        image: item.data.image,
+        title: item.title,
+        date: item.date,
+        url: item.url,
+        image: item.image,
         category: "Blog",
-        description: item.data.excerpt,
+        description: item.excerpt,
         body: "", // External blogs don't have body content available here
         originalItem: item,
     })),
@@ -58,10 +59,12 @@ const publicationColorCode: Record<string, string> = {
 
 <section class="section blog-section">
     <div class="container">
-        <div class="section-header">
-            <h2 class="section-heading">Latest</h2>
-            <a href="/blog" class="view-all-link">View All</a>
-        </div>
+        <header class="section-header">
+            <div>
+                <span class="eyebrow">Latest</span>
+            </div>
+            <a href="/articles" class="view-all-link">View All →</a>
+        </header>
 
         <div class="articles-grid">
             {
@@ -71,71 +74,40 @@ const publicationColorCode: Record<string, string> = {
                         readTime = getReadingTime(item.body);
                     }
 
+                    const publication = item.originalItem?.platform ?? item.category;
+                    const bgColor = publicationColorCode[publication] ?? "807868";
+
                     return (
                         <article class="article-card">
                             <a
                                 href={item.url}
                                 class="card-link"
-                                target={
-                                    item.type === "blog" ? "_blank" : "_self"
-                                }
-                                rel={
-                                    item.type === "blog"
-                                        ? "noopener noreferrer"
-                                        : ""
-                                }
+                                target={item.type === "blog" ? "_blank" : "_self"}
+                                rel={item.type === "blog" ? "noopener noreferrer" : ""}
                             >
                                 <div class="card-image">
-                                      {item.image ? (
-                                <img src={item.image} alt={item.title} />
-                                ) : (() => {
-                                const publication = item.originalItem.data.platform; // or item.publication
-                                const bgColor = publicationColorCode[publication] ?? "E07A5F";
-
-                                return (
-                                    <img
-                                    src={`https://placehold.co/600x400/${bgColor}/FFFFFF?text=${encodeURIComponent(publication)}`}
-                                    alt={item.title}
-                                    />
-                                );
-                                })()}
-                                    <div class="card-category">
-                                        {item.category}
-                                    </div>
+                                    {item.image ? (
+                                        <img src={item.image} alt={item.title} />
+                                    ) : (
+                                        <img
+                                            src={`https://placehold.co/600x400/${bgColor}/f4efe6?text=${encodeURIComponent(publication)}`}
+                                            alt={item.title}
+                                        />
+                                    )}
                                 </div>
                                 <div class="card-content">
+                                    <span class="card-eyebrow">{item.category}</span>
                                     <h3 class="card-title">{item.title}</h3>
-                                    <p class="card-excerpt">
-                                        {item.description}
-                                    </p>
+                                    <p class="card-excerpt">{item.description}</p>
                                     <div class="card-meta">
-                                        <div class="author-info">
-                                            <img
-                                                src={authorAvatar}
-                                                alt={authorName}
-                                                class="author-avatar"
-                                            />
-                                            <span class="author-name">
-                                                {authorName}
-                                            </span>
-                                        </div>
-                                        <div class="meta-divider" />
-                                        <div class="article-stats">
-                                            <span class="date">
-                                                {item.date.toLocaleDateString(
-                                                    "en-US",
-                                                    {
-                                                        month: "short",
-                                                        day: "numeric",
-                                                        year: "numeric",
-                                                    },
-                                                )}
-                                            </span>
-                                            <span class="dot">•</span>
-                                            <span class="read-time">
-                                                {readTime}
-                                            </span>
-                                        </div>
+                                        <time class="card-date">
+                                            {item.date.toLocaleDateString("en-US", {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric",
+                                            })}
+                                        </time>
+                                        <span class="card-read-time">{readTime}</span>
                                     </div>
                                 </div>
                             </a>
@@ -149,59 +121,70 @@ const publicationColorCode: Record<string, string> = {
 
 <style>
     .blog-section {
-        background-color: #f8f9fa;
+        background-color: var(--paper);
+        border-top: 1px solid var(--ink);
     }
 
     .section-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-end;
-        margin-bottom: var(--spacing-xl);
-        position: relative;
+        padding-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid var(--ink);
     }
 
-    .section-header .section-heading {
-        margin-bottom: 0;
-        left: 0;
-        transform: none;
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--accent);
     }
 
-    .section-header .section-heading::after {
-        left: 0;
-        transform: none;
+    .eyebrow::before {
+        content: '';
+        display: inline-block;
+        width: 1.5rem;
+        height: 1px;
+        background: var(--accent);
     }
 
     .view-all-link {
-        color: var(--color-accent);
-        font-weight: 600;
-        text-decoration: none;
-        transition: transform 0.2s ease;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--ink-mid);
+        transition: color 0.15s var(--ease-editorial);
     }
 
     .view-all-link:hover {
-        transform: translateX(5px);
+        color: var(--ink);
     }
 
     .articles-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: var(--spacing-lg);
+        gap: 1.5rem;
     }
 
     .article-card {
-        background: white;
-        border-radius: 12px;
+        background: var(--paper-soft);
+        border: 1px solid var(--rule-soft);
         overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        transition:
-            transform 0.3s ease,
-            box-shadow 0.3s ease;
-        height: 100%;
+        transition: border-color 0.24s var(--ease-editorial), transform 0.24s var(--ease-editorial);
+        display: flex;
+        flex-direction: column;
     }
 
     .article-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        border-color: var(--ink);
+        transform: translateY(-2px);
     }
 
     .card-link {
@@ -213,7 +196,6 @@ const publicationColorCode: Record<string, string> = {
     }
 
     .card-image {
-        position: relative;
         height: 200px;
         overflow: hidden;
     }
@@ -222,36 +204,12 @@ const publicationColorCode: Record<string, string> = {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.5s ease;
+        transition: transform 0.4s var(--ease-editorial);
+        filter: grayscale(15%) contrast(1.02);
     }
 
     .article-card:hover .card-image img {
-        transform: scale(1.05);
-    }
-
-    .placeholder-image {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            135deg,
-            var(--color-primary-light),
-            var(--color-secondary-light)
-        );
-    }
-
-    .card-category {
-        position: absolute;
-        top: 1rem;
-        left: 1rem;
-        background: rgba(255, 255, 255, 0.9);
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--color-primary);
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        backdrop-filter: blur(4px);
+        transform: scale(1.03);
     }
 
     .card-content {
@@ -261,11 +219,25 @@ const publicationColorCode: Record<string, string> = {
         flex: 1;
     }
 
-    .card-title {
-        font-size: 1.25rem;
+    .card-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--accent);
         margin-bottom: 0.75rem;
-        color: var(--color-text);
-        line-height: 1.4;
+        display: block;
+    }
+
+    .card-title {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        line-height: 1.25;
+        color: var(--ink);
+        font-variation-settings: "opsz" 36, "SOFT" 30, "WONK" 0;
+        margin-bottom: 0.75rem;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
@@ -273,15 +245,16 @@ const publicationColorCode: Record<string, string> = {
     }
 
     .card-excerpt {
-        font-size: 0.95rem;
-        color: var(--color-text-light);
-        margin-bottom: 1.5rem;
-        line-height: 1.6;
+        font-family: var(--font-body);
+        font-size: 0.9375rem;
+        color: var(--ink-mid);
+        line-height: 1.65;
         display: -webkit-box;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
         flex: 1;
+        margin-bottom: 1.25rem;
     }
 
     .card-meta {
@@ -289,57 +262,24 @@ const publicationColorCode: Record<string, string> = {
         align-items: center;
         justify-content: space-between;
         padding-top: 1rem;
-        border-top: 1px solid var(--color-border);
-        font-size: 0.85rem;
-        color: var(--color-text-light);
+        border-top: 1px solid var(--rule-soft);
+        margin-top: auto;
     }
 
-    .author-info {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .author-avatar {
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-
-    .author-name {
-        font-weight: 500;
-        color: var(--color-text);
-    }
-
-    .article-stats {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .dot {
-        font-size: 0.5rem;
-        opacity: 0.5;
-    }
-
-    /* Icons */
-    .icon {
-        width: 16px;
-        height: 16px;
-        fill: currentColor;
+    .card-date,
+    .card-read-time {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-soft);
     }
 
     @media (max-width: 768px) {
         .section-header {
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
             gap: 1rem;
-            text-align: center;
-        }
-
-        .view-all-link {
-            font-size: 0.9rem;
         }
     }
 </style>

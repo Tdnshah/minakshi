@@ -8,100 +8,96 @@ interface Props {
 const { title, subtitle, image } = Astro.props;
 ---
 
-<section
-    class="hero"
-    style="background-image: url('/images/backgrounds/banyan-hero-16-9.png');"
->
+<section class="hero" style={image ? `background-image: url('${image}')` : `background-image: url('/images/backgrounds/banyan-hero-16-9.png')`}>
     <div class="hero-overlay"></div>
     <div class="container hero-content">
         <div class="hero-text">
+            <span class="hero-eyebrow">Anthropologist · Author · Consultant</span>
             <h1 class="hero-title">{title}</h1>
             <p class="hero-subtitle">{subtitle}</p>
             <slot />
         </div>
-        {
-            image && (
-                <div class="hero-image">
-                    <img src={image} alt={title} />
-                </div>
-            )
-        }
     </div>
 </section>
 
 <style>
     .hero {
-        padding: var(--spacing-xl) 0;
-        background-color: var(--color-bg-light);
+        padding: 6rem 0 5rem;
+        background-color: var(--paper);
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         position: relative;
-        min-height: 600px;
+        min-height: 580px;
         display: flex;
         align-items: center;
+        border-bottom: 1px solid var(--ink);
     }
 
     .hero-overlay {
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(
-            253,
-            251,
-            247,
-            0.65
-        ); /* Uniform subtle overlay to mute the tree but keep it visible */
+        inset: 0;
+        background: rgba(244, 239, 230, 0.72);
         z-index: 1;
     }
 
     .hero-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: var(--spacing-xl);
-        align-items: center;
         position: relative;
         z-index: 2;
     }
 
+    .hero-text {
+        max-width: 64ch;
+    }
+
+    .hero-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--accent);
+        margin-bottom: 1.25rem;
+    }
+
+    .hero-eyebrow::before {
+        content: '';
+        display: inline-block;
+        width: 1.5rem;
+        height: 1px;
+        background: var(--accent);
+    }
+
     .hero-title {
-        font-size: 3.5rem;
-        margin-bottom: var(--spacing-sm);
-        color: var(--color-primary);
-        text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+        font-family: var(--font-display);
+        font-size: clamp(2.75rem, 8vw, 7rem);
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 0.94;
+        letter-spacing: -0.035em;
+        font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
+        margin-bottom: 1.5rem;
     }
 
     .hero-subtitle {
-        font-family: var(--font-sans);
-        font-size: 1.3rem;
-        color: var(--color-text-light);
-        opacity: 0.9;
-        margin-bottom: var(--spacing-lg);
-        font-weight: 500;
-    }
-
-    .hero-image img {
-        border-radius: 8px;
-        /* box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); */
-        transform: rotate(2deg);
-        transition: transform 0.3s ease;
-    }
-
-    .hero-image img:hover {
-        transform: rotate(0deg) scale(1.02);
+        font-family: var(--font-display);
+        font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+        font-weight: 400;
+        color: var(--ink-mid);
+        line-height: 1.45;
+        letter-spacing: -0.015em;
+        font-variation-settings: "opsz" 24, "SOFT" 50;
+        max-width: 56ch;
+        margin-bottom: 2rem;
     }
 
     @media (max-width: 768px) {
-        .hero-content {
-            grid-template-columns: 1fr;
-            text-align: center;
-        }
-
-        .hero-image {
-            order: -1;
-            margin-bottom: var(--spacing-lg);
+        .hero {
+            padding: 4rem 0 3.5rem;
+            min-height: auto;
         }
     }
 </style>

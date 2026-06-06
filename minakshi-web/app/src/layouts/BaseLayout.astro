@@ -21,13 +21,32 @@ const { title, description = "Minakshi Dewan - Researcher, Author, Academic" } =
         <meta name="generator" content={Astro.generator} />
         <meta name="description" content={description} />
 
-        <!-- Google Fonts -->
+        <!-- Google Fonts: Fraunces (variable), Inter, JetBrains Mono -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
-            href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
             rel="stylesheet"
         />
+
+        {
+            import.meta.env.PROD && (
+                <>
+                <!-- Google tag (gtag.js) -->
+                <script is:inline src="https://www.googletagmanager.com/gtag/js?id=G-VFG97T6WN5"></script>
+                <script is:inline>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag() {
+                    dataLayer.push(arguments);
+                    }
+                    gtag('js', new Date());
+
+                    gtag('config', 'G-VFG97T6WN5');
+                </script>
+                <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+                </>
+            )
+        }
 
         <title>{title} | Minakshi Dewan</title>
     </head>

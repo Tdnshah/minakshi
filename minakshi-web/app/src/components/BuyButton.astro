@@ -18,14 +18,38 @@ const { href, label = "Buy Now", variant = "primary" } = Astro.props;
 </a>
 
 <style>
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-family: var(--font-body);
+        font-size: 0.9375rem;
+        font-weight: 500;
+        padding: 0.875rem 1.5rem;
+        border: 1px solid var(--ink);
+        transition: background 180ms var(--ease-editorial), border-color 180ms var(--ease-editorial), color 180ms var(--ease-editorial);
+    }
+
+    .btn-primary {
+        background: var(--ink);
+        color: var(--paper);
+        border-color: var(--ink);
+    }
+
+    .btn-primary:hover {
+        background: var(--accent);
+        border-color: var(--accent);
+    }
+
     .btn-secondary {
-        background-color: transparent;
-        border: 2px solid var(--color-accent);
-        color: var(--color-accent);
+        background: transparent;
+        border: 1px solid var(--ink);
+        color: var(--ink);
     }
 
     .btn-secondary:hover {
-        background-color: var(--color-accent);
-        color: white;
+        background: var(--ink);
+        color: var(--paper);
     }
 </style>

@@ -1,10 +1,19 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import { fetchPodcasts } from "../../lib/payload/podcasts";
+import { fetchInterviews } from "../../lib/payload/interviews";
+import PageHeader from "../../components/system/PageHeader.astro";
+import SectionHeader from "../../components/system/SectionHeader.astro";
+export const prerender = false;
 
-const podcasts = await getCollection("podcasts");
+const podcasts = await fetchPodcasts();
 const sortedPodcasts = podcasts.sort(
-    (a, b) => b.data.publishedAt.valueOf() - a.data.publishedAt.valueOf(),
+    (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt),
+);
+
+const interviews = await fetchInterviews();
+const sortedInterviews = interviews.sort(
+    (a, b) => new Date(b.publishedAt) - new Date(a.publishedAt),
 );
 
 // Format date helper
@@ -20,70 +29,106 @@ const formatDate = (date: Date) => {
 <BaseLayout title="Podcasts & Interviews">
     <section class="section">
         <div class="container">
-            <h1 class="page-title">Podcasts & Interviews</h1>
-            <p class="page-description">
-                Listen to conversations, interviews, and discussions featuring
-                Minakshi Dewan.
-            </p>
-
-            <div class="podcasts-grid">
-                {
-                    sortedPodcasts.map((podcast) => (
-                        <a
-                            href={`/podcasts/${podcast.id}`}
-                            class="podcast-card"
-                        >
-                            <article>
-                                <div class="podcast-content">
-                                    <div class="podcast-meta">
-                                        <span class="platform-badge">
-                                            {podcast.data.platform}
+            <PageHeader
+                eyebrow="Audio & Video"
+                title="Podcasts & Interviews"
+                description="Conversations, interviews, and long-form discussions featuring Minakshi Dewan."
+            />
+            <div>
+                <SectionHeader
+                    eyebrow="Series"
+                    title="Podcasts"
+                    italicPart="archive."
+                />
+                 <div class="podcasts-grid">
+                    {
+                        sortedPodcasts.map((podcast) => (
+                            <a
+                                href={`/podcasts/${podcast.id}`}
+                                class="podcast-card"
+                            >
+                                <article>
+                                    <div class="podcast-content">
+                                        <div class="podcast-meta">
+                                            <span class="platform-badge">
+                                                {podcast.platform}
+                                            </span>
+                                            <time
+                                                datetime={podcast.publishedAt.toISOString()}
+                                            >
+                                                {formatDate(
+                                                    podcast.publishedAt,
+                                                )}
+                                            </time>
+                                        </div>
+                                        <h2 class="podcast-title">
+                                            {podcast.title}
+                                        </h2>
+                                        {podcast.description && (
+                                            <p class="podcast-description">
+                                                {podcast.description}
+                                            </p>
+                                        )}
+                                        <span class="read-more">
+                                            Listen / Watch →
                                         </span>
-                                        <time
-                                            datetime={podcast.data.publishedAt.toISOString()}
-                                        >
-                                            {formatDate(
-                                                podcast.data.publishedAt,
-                                            )}
-                                        </time>
                                     </div>
-                                    <h2 class="podcast-title">
-                                        {podcast.data.title}
-                                    </h2>
-                                    {podcast.data.description && (
-                                        <p class="podcast-description">
-                                            {podcast.data.description}
-                                        </p>
-                                    )}
-                                    <span class="read-more">
-                                        Listen / Watch →
-                                    </span>
-                                </div>
-                            </article>
-                        </a>
-                    ))
-                }
+                                </article>
+                            </a>
+                        ))
+                    }
+                </div>
+            </div>
+            <div>
+                <SectionHeader
+                    eyebrow="Features"
+                    title="Interviews"
+                    italicPart="archive."
+                />
+                 <div class="podcasts-grid">
+                    {
+                        sortedInterviews.map((interview) => (
+                            <a
+                                href={`/podcasts/${interview.id}`}
+                                class="podcast-card"
+                            >
+                                <article>
+                                    <div class="podcast-content">
+                                        <div class="podcast-meta">
+                                            <span class="platform-badge">
+                                                {interview.platform}
+                                            </span>
+                                            <time
+                                                datetime={interview.publishedAt.toISOString()}
+                                            >
+                                                {formatDate(
+                                                    interview.publishedAt,
+                                                )}
+                                            </time>
+                                        </div>
+                                        <h2 class="podcast-title">
+                                            {interview.title}
+                                        </h2>
+                                        {interview.description && (
+                                            <p class="podcast-description">
+                                                {interview.description}
+                                            </p>
+                                        )}
+                                        <span class="read-more">
+                                            Listen / Watch →
+                                        </span>
+                                    </div>
+                                </article>
+                            </a>
+                        ))
+                    }
+                </div>
             </div>
         </div>
     </section>
 </BaseLayout>
 
 <style>
-    .page-title {
-        text-align: center;
-        margin-bottom: var(--spacing-sm);
-        font-size: 2.5rem;
-        color: var(--color-text-heading);
-    }
-
-    .page-description {
-        text-align: center;
-        max-width: 600px;
-        margin: 0 auto var(--spacing-xl);
-        color: var(--color-text-body);
-        font-size: 1.1rem;
-    }
-
     .podcasts-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
