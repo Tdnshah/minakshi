@@ -1,0 +1,7 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Local reference/prototype artifacts (HTML design reference, not source)
+minakshi-web/Minakshi-deewan-Claude-sonnet/
+QuickShare_*/

@@ -1,120 +1,431 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+export const prerender = false;
 
-const books = await getCollection("books");
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { fetchBooks, toSlug } from "../../lib/payload/books";
+import PageHeader from "../../components/system/PageHeader.astro";
+
+const books = await fetchBooks();
 const sortedBooks = books.sort(
-    (a, b) => b.data.releaseDate.valueOf() - a.data.releaseDate.valueOf(),
+    (a, b) => new Date(b.releaseDate).valueOf() - new Date(a.releaseDate).valueOf(),
 );
+
+const [featured, ...rest] = sortedBooks;
 ---
 
 <BaseLayout title="Books">
-    <section class="section">
+
+    <!-- Page Header -->
+    <section class="section section--tight">
         <div class="container">
-            <h1 class="page-title">Books</h1>
-            <div class="books-grid">
-                {
-                    sortedBooks.map((book) => (
-                        <div class="book-card">
-                            <a href={`/books/${book.slug}`} class="book-cover">
-                                <img
-                                    src={book.data.coverImage}
-                                    alt={book.data.title}
-                                />
-                            </a>
-                            <div class="book-info">
-                                <h2 class="book-title">
-                                    <a href={`/books/${book.slug}`}>
-                                        {book.data.title}
-                                    </a>
-                                </h2>
-                                {book.data.subtitle && (
-                                    <p class="book-subtitle">
-                                        {book.data.subtitle}
-                                    </p>
-                                )}
-                                <p class="book-desc">
-                                    {book.data.description.slice(0, 150)}...
-                                </p>
-                                <a
-                                    href={`/books/${book.slug}`}
-                                    class="btn btn-sm"
-                                >
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    ))
-                }
-            </div>
+            <PageHeader
+                eyebrow="Written Works"
+                title="Books"
+                description="Explorations of culture, society, and the human experience."
+            />
         </div>
     </section>
+
+    {sortedBooks.length === 0 && (
+        <section class="section">
+            <div class="container">
+                <p class="cms-notice">Content is loading — please refresh in a moment.</p>
+            </div>
+        </section>
+    )}
+
+    <!-- Featured / Latest Book -->
+    {featured && (() => {
+        const slug = toSlug(featured.title);
+        const cover = featured.coverImage?.url ?? '';
+        const year = new Date(featured.releaseDate).getFullYear();
+        return (
+            <section class="featured-section">
+                <div class="container">
+                    <div class="featured-inner">
+                        <div class="featured-cover-col">
+                            <a href={`/books/${slug}`} class="featured-cover-link">
+                                <div class="featured-cover-wrap">
+                                    <img src={cover} alt={featured.title} class="featured-cover-img" />
+                                    <div class="featured-cover-shadow"></div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="featured-info-col">
+                            <span class="featured-badge">Latest Book</span>
+                            <h2 class="featured-title">
+                                <a href={`/books/${slug}`}>{featured.title}</a>
+                            </h2>
+                            {featured.subtitle && <p class="featured-subtitle">{featured.subtitle}</p>}
+                            <div class="featured-meta">
+                                <span class="featured-meta-item">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                                    {featured.publisher}
+                                </span>
+                                <span class="featured-meta-item">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                                    {year}
+                                </span>
+                            </div>
+                            {featured.excerpt && <p class="featured-excerpt">{featured.excerpt}</p>}
+                            {(featured.awards?.length ?? 0) > 0 && (
+                                <div class="featured-awards">
+                                    {featured.awards!.slice(0, 2).map(a => (
+                                        <span class={`award-chip award-chip--${a.status ?? 'shortlisted'}`}>
+                                            {a.status === 'winner' ? '🏆' : '🏅'} {a.title}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                            <a href={`/books/${slug}`} class="featured-cta">
+                                Explore the Book
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+    })()}
+
+    <!-- All Other Books -->
+    {rest.length > 0 && (
+        <section class="all-books-section">
+            <div class="container">
+                <h2 class="all-books-heading">More Books</h2>
+                <div class="books-grid">
+                    {rest.map((book) => {
+                        const slug = toSlug(book.title);
+                        const cover = book.coverImage?.url ?? '';
+                        const year = new Date(book.releaseDate).getFullYear();
+                        return (
+                            <article class="book-card">
+                                <a href={`/books/${slug}`} class="book-cover-link">
+                                    <div class="book-cover-wrap">
+                                        <img src={cover} alt={book.title} class="book-cover-img" loading="lazy" />
+                                    </div>
+                                </a>
+                                <div class="book-info">
+                                    <h3 class="book-title">
+                                        <a href={`/books/${slug}`}>{book.title}</a>
+                                    </h3>
+                                    {book.subtitle && <p class="book-subtitle">{book.subtitle}</p>}
+                                    <p class="book-meta">
+                                        <span>{book.publisher}</span>
+                                        <span class="meta-dot">·</span>
+                                        <span>{year}</span>
+                                    </p>
+                                    <a href={`/books/${slug}`} class="book-link">
+                                        Read more
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                                    </a>
+                                </div>
+                            </article>
+                        );
+                    })}
+                </div>
+            </div>
+        </section>
+    )}
+
 </BaseLayout>
 
 <style>
-    .page-title {
-        text-align: center;
-        margin-bottom: var(--spacing-xl);
+    /* Featured section */
+    .featured-section {
+        padding: 5rem 0;
+        background: white;
+    }
+
+    .featured-inner {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 4rem;
+        align-items: center;
+    }
+
+    .featured-cover-link { display: block; }
+
+    .featured-cover-wrap {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .featured-cover-img {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow:
+            0 4px 8px rgba(0,0,0,0.08),
+            0 16px 40px rgba(0,0,0,0.18),
+            0 32px 64px rgba(0,0,0,0.10);
+        transform: rotate(-1.5deg);
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+        display: block;
+    }
+
+    .featured-cover-link:hover .featured-cover-img {
+        transform: rotate(0deg) scale(1.02);
+        box-shadow:
+            0 8px 16px rgba(0,0,0,0.10),
+            0 24px 56px rgba(0,0,0,0.22);
+    }
+
+    .featured-cover-shadow {
+        position: absolute;
+        bottom: -16px;
+        left: 10%;
+        right: 10%;
+        height: 30px;
+        background: rgba(0,0,0,0.22);
+        filter: blur(16px);
+        border-radius: 50%;
+        z-index: -1;
+    }
+
+    .featured-info-col {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .featured-badge {
+        display: inline-block;
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--color-primary);
+        background: rgba(46,125,140,0.1);
+        padding: 4px 14px;
+        border-radius: 20px;
+        width: fit-content;
+    }
+
+    .featured-title {
+        font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+        line-height: 1.15;
+        margin: 0;
+    }
+
+    .featured-title a {
+        color: var(--color-text-light);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .featured-title a:hover { color: var(--color-primary); }
+
+    .featured-subtitle {
+        font-family: var(--font-sans);
+        font-size: 1.15rem;
+        color: var(--color-accent);
+        margin: 0;
+    }
+
+    .featured-meta {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        padding: 0.75rem 0;
+        border-top: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .featured-meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.875rem;
+        color: #666;
+        font-family: var(--font-sans);
+    }
+
+    .featured-meta-item svg { color: var(--color-primary); }
+
+    .featured-excerpt {
+        font-size: 1.05rem;
+        line-height: 1.8;
+        color: #555;
+        margin: 0;
+        max-width: 56ch;
+    }
+
+    .featured-awards {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .award-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-family: var(--font-sans);
+    }
+
+    .award-chip--winner     { background: rgba(212,165,116,0.2); color: #8A5C1A; border: 1px solid rgba(212,165,116,0.4); }
+    .award-chip--shortlisted { background: rgba(46,125,140,0.1);  color: #2E7D8C; border: 1px solid rgba(46,125,140,0.25); }
+    .award-chip--longlisted  { background: rgba(139,90,142,0.1);  color: #6B3D6E; border: 1px solid rgba(139,90,142,0.25); }
+    .award-chip--nominated   { background: rgba(106,153,78,0.1);  color: #4A7830; border: 1px solid rgba(106,153,78,0.25); }
+
+    .featured-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--color-primary);
+        color: white;
+        text-decoration: none;
+        font-family: var(--font-sans);
+        font-size: 0.95rem;
+        font-weight: 700;
+        padding: 0.85rem 1.75rem;
+        border-radius: 8px;
+        width: fit-content;
+        transition: background 0.2s ease, transform 0.2s ease, gap 0.2s ease;
+    }
+
+    .featured-cta:hover {
+        background: #256B7A;
+        transform: translateY(-2px);
+        gap: 14px;
+    }
+
+    /* All other books */
+    .all-books-section {
+        padding: 4rem 0 5rem;
+        background: var(--color-bg-light);
+    }
+
+    .all-books-heading {
+        font-size: 1.5rem;
+        margin-bottom: 2.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--color-border);
     }
 
     .books-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: var(--spacing-xl);
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2.5rem;
     }
 
     .book-card {
         display: flex;
-        gap: var(--spacing-md);
-        align-items: start;
+        gap: 1.25rem;
+        align-items: flex-start;
     }
 
-    .book-cover {
-        flex: 0 0 120px;
-    }
+    .book-cover-link { flex: 0 0 100px; }
 
-    .book-cover img {
+    .book-cover-wrap {
+        position: relative;
         width: 100%;
-        border-radius: 4px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s ease;
     }
 
-    .book-cover:hover img {
-        transform: translateY(-4px);
+    .book-cover-img {
+        width: 100%;
+        border-radius: 5px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+        display: block;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .book-cover-link:hover .book-cover-img {
+        transform: translateY(-4px) rotate(-0.5deg);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.20);
+    }
+
+    .book-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        padding-top: 0.25rem;
     }
 
     .book-title {
-        font-size: 1.2rem;
-        margin-bottom: var(--spacing-xs);
+        font-size: 1.1rem;
+        line-height: 1.35;
+        margin: 0;
     }
+
+    .book-title a {
+        color: var(--color-text-light);
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+    .book-title a:hover { color: var(--color-primary); }
 
     .book-subtitle {
-        font-size: 0.9rem;
+        font-size: 0.875rem;
         color: var(--color-accent);
-        margin-bottom: var(--spacing-sm);
+        margin: 0;
+        line-height: 1.4;
     }
 
-    .book-desc {
-        font-size: 0.9rem;
-        margin-bottom: var(--spacing-md);
+    .book-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: #999;
+        font-family: var(--font-sans);
+        margin: 0;
     }
 
-    .btn-sm {
-        padding: 0.5rem 1rem;
+    .meta-dot { color: #ccc; }
+
+    .book-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
         font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        text-decoration: none;
+        font-family: var(--font-sans);
+        margin-top: 0.5rem;
+        transition: gap 0.2s, color 0.2s;
     }
 
-    @media (max-width: 600px) {
-        .book-card {
-            flex-direction: column;
-            align-items: center;
+    .book-link:hover {
+        gap: 10px;
+        color: var(--color-accent);
+    }
+
+    .cms-notice {
+        text-align: center;
+        color: #888;
+        padding: 4rem 0;
+        font-size: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+        .featured-inner {
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
             text-align: center;
         }
 
-        .book-cover {
-            width: 150px;
-            margin-bottom: var(--spacing-md);
+        .featured-cover-link {
+            max-width: 220px;
+            margin: 0 auto;
         }
+
+        .featured-meta { justify-content: center; }
+        .featured-awards { justify-content: center; }
+        .featured-cta { margin: 0 auto; }
+        .featured-excerpt { margin: 0 auto; }
+        .featured-badge { margin: 0 auto; }
+    }
+
+    @media (max-width: 520px) {
+        .books-grid { grid-template-columns: 1fr; }
     }
 </style>

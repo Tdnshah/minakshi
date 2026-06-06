@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import PageHeader from "../../components/system/PageHeader.astro";
 
 const conferences = await getCollection("conferences");
 const sortedConferences = conferences.sort((a, b) => b.data.year - a.data.year);
@@ -26,7 +27,11 @@ const years = Object.keys(groupedByYear)
 <BaseLayout title="Conferences & Workshops">
     <section class="section">
         <div class="container">
-            <h1 class="page-title">Conferences & Workshops</h1>
+            <PageHeader
+                eyebrow="Events"
+                title="Conferences & Workshops"
+                description="Selected talks, papers, and panels across anthropology, public health, and death studies."
+            />
               <div class="intro">
                 <p>
                 Minakshi has actively participated in national and international conferences, presenting research and engaging in dialogues at the intersections of death studies, traditional healing, gender, and social anthropology. 
@@ -35,7 +40,7 @@ const years = Object.keys(groupedByYear)
                 Her work has been featured at prestigious platforms such as the American Anthropological Association (Tampa), the Death, Dying and Disposal International Conference (Utrecht), and Jawaharlal Nehru University (New Delhi), among others.
                 </p>
                 <p>
-                    Through papers, panel discussions, and invited talks, she brings anethnographic lens to complex questions of ritual, care, caste, and cultural meanings of death and healing. Her participation in these forums reflects an ongoing commitment to bridging academic research with lived experiences and public understanding.
+                    Through papers, panel discussions, and invited talks, she brings an ethnographic lens to complex questions of ritual, care, caste, and cultural meanings of death and healing. Her participation in these forums reflects an ongoing commitment to bridging academic research with lived experiences and public understanding.
                 </p>
             </div>
             {
@@ -87,13 +92,7 @@ const years = Object.keys(groupedByYear)
 </BaseLayout>
 
 <style>
-
-
-    .page-title {
-        text-align: center;
-        margin-bottom: var(--spacing-xl);
-    }
-        .intro {
+    .intro {
         max-width: 800px;
         margin: 0 auto var(--spacing-xl);
         text-align: center;

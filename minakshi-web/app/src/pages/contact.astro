@@ -1,12 +1,17 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ContactForm from "../components/ContactForm.astro";
+import PageHeader from "../components/system/PageHeader.astro";
 ---
 
 <BaseLayout title="Contact">
     <section class="section">
         <div class="container">
-            <h1 class="page-title">Get in Touch</h1>
+            <PageHeader
+                eyebrow="Contact"
+                title="Get in Touch"
+                description="For speaking engagements, media inquiries, and collaborations."
+            />
 
             <div class="contact-grid">
                 <div class="contact-info">
@@ -34,97 +39,10 @@ import ContactForm from "../components/ContactForm.astro";
                             </a>
                         </div>
                     </div>
-
-                    <div class="quick-links">
-                        <h3>Quick Actions</h3>
-                        <ul>
-                            <li>
-                                <a href="#signed-copy">Request Signed Copy</a>
-                            </li>
-                            <li><a href="#speaking">Invite for Speaking</a></li>
-                            <li><a href="#newsletter">Newsletter Signup</a></li>
-                        </ul>
-                    </div>
                 </div>
-
                 <div class="contact-form-section">
                     <h2>Send a Message</h2>
                     <ContactForm />
-                </div>
-            </div>
-
-            <div class="additional-forms">
-                <div class="form-section" id="signed-copy">
-                    <h2>Request Signed Copy</h2>
-                    <form class="special-form">
-                        <div class="form-group">
-                            <label for="book-select">Select Book</label>
-                            <select id="book-select" name="book" required>
-                                <option value="">Choose a book...</option>
-                                <option value="final-farewell"
-                                    >The Final Farewell</option
-                                >
-                                <option value="everyday-superheroes"
-                                    >Everyday Superheroes</option
-                                >
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="dedication">Dedication (optional)</label
-                            >
-                            <input
-                                type="text"
-                                id="dedication"
-                                name="dedication"
-                                placeholder="To..."
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label for="shipping-name">Name</label>
-                            <input
-                                type="text"
-                                id="shipping-name"
-                                name="name"
-                                required
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label for="shipping-email">Email</label>
-                            <input
-                                type="email"
-                                id="shipping-email"
-                                name="email"
-                                required
-                            />
-                        </div>
-                        <div class="form-group">
-                            <label for="shipping-address"
-                                >Shipping Address</label
-                            >
-                            <textarea
-                                id="shipping-address"
-                                name="address"
-                                rows="3"
-                                required></textarea>
-                        </div>
-                        <button type="submit" class="btn">Submit Request</button
-                        >
-                    </form>
-                </div>
-
-                <div class="form-section" id="newsletter">
-                    <h2>Newsletter Signup</h2>
-                    <p>
-                        Stay updated on new publications, events, and research.
-                    </p>
-                    <form class="newsletter-form">
-                        <input
-                            type="email"
-                            placeholder="Your email address"
-                            required
-                        />
-                        <button type="submit" class="btn">Subscribe</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -132,11 +50,6 @@ import ContactForm from "../components/ContactForm.astro";
 </BaseLayout>
 
 <style>
-    .page-title {
-        text-align: center;
-        margin-bottom: var(--spacing-xl);
-    }
-
     .contact-grid {
         display: grid;
         grid-template-columns: 1fr 1.5fr;

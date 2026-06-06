@@ -1,0 +1,44 @@
+---
+interface NavLink {
+    label: string;
+    href: string;
+    active?: boolean;
+}
+
+interface Props {
+    brandName: string;
+    navLinks: NavLink[];
+    ctaLabel: string;
+    ctaHref?: string;
+}
+
+const { brandName, navLinks, ctaLabel, ctaHref = '#' } = Astro.props;
+---
+
+<nav class="fixed top-0 w-full z-50 bg-[#fcf9f3]/80 backdrop-blur-md">
+    <div class="flex justify-between items-center px-12 py-6 max-w-screen-2xl mx-auto">
+        <div class="font-['Noto_Serif'] font-bold text-2xl text-[#003030]">{brandName}</div>
+
+        <div class="hidden md:flex gap-10 items-center">
+            {navLinks.map((link) => (
+                <a
+                    href={link.href}
+                    class={
+                        link.active
+                            ? "font-['Noto_Serif'] text-lg tracking-tight text-[#775a19] border-b-2 border-[#775a19] pb-1"
+                            : "font-['Noto_Serif'] text-lg tracking-tight text-[#003030] opacity-70 hover:opacity-100 hover:text-[#775a19] transition-all"
+                    }
+                >
+                    {link.label}
+                </a>
+            ))}
+        </div>
+
+        <a
+            href={ctaHref}
+            class="bg-secondary text-on-secondary px-6 py-2 rounded-md hover:scale-105 transition-transform font-medium"
+        >
+            {ctaLabel}
+        </a>
+    </div>
+</nav>

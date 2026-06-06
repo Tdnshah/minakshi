@@ -1,155 +1,321 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Hero from "../components/Hero.astro";
-import MediaLogoWall from "../components/MediaLogoWall.astro";
-import HomeBlogSection from "../components/HomeBlogSection.astro";
-import InfiniteScrollingLogosAnimation from "../components/InfiniteScrollingLogosAnimation.astro";
-import { getCollection } from "astro:content";
+export const prerender = false;
 
-const books = await getCollection("books");
-const featuredBook = books.find((book) => book.slug === "the-final-farewell") || books[0];
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import HomeHero from "../components/system/HomeHero.astro";
+import PressMarquee from "../components/system/PressMarquee.astro";
+import ImageContentCard from "../components/system/ImageContentCard.astro";
+import { fetchBooks, toSlug } from "../lib/payload/books";
+import { fetchArticles } from "../lib/payload/articles";
+
+const [books, articles, press] = await Promise.all([
+    fetchBooks(),
+    fetchArticles(),
+    getCollection("press"),
+]);
+
+const featuredBook = [...books].sort(
+    (a, b) =>
+        new Date(b.releaseDate).valueOf() - new Date(a.releaseDate).valueOf(),
+)[0];
+
+const latestArticles = [...articles]
+    .sort((a, b) => b.date.valueOf() - a.date.valueOf())
+    .slice(0, 3);
+
+const publications = [
+    ...new Set([
+        ...articles.map((article) => article.platform),
+        ...press.map((item) => item.data.outlet),
+    ]),
+].slice(0, 8);
+
+const figures = [
+    { value: "20+", label: "Years of fieldwork" },
+    { value: "4", label: "Books authored" },
+    { value: "120+", label: "Essays & columns" },
+    { value: "14", label: "Indian states surveyed" },
+];
 ---
 
 <BaseLayout title="Home">
-    <Hero
-        title="Minakshi Dewan"
-        subtitle="Researcher • Author • Academic"
-        image="../images/minakshidewan.png"
-    >
-        <p class="intro-text">
-            Exploring the intersections of gender, health, and society in modern
-            India.
-        </p>
-        <div class="hero-cta">
-            <a href="/books" class="btn">View Books</a>
-            <a href="/about" class="btn btn-secondary">About Me</a>
-        </div>
-    </Hero>
+    <HomeHero
+        eyebrow="Est. Delhi · Writing since 2005"
+        firstName="Minakshi"
+        lastName="Dewan."
+        description="Writing on the rituals of death, the politics of gender, and the public health of a changing India."
+        roles={["Author", "Researcher", "PhD, JNU", "Public Health"]}
+        portraitSrc="/images/minakshidewan.png"
+        portraitAlt="Portrait of Minakshi Dewan"
+        portraitCaption="Minakshi Dewan, Delhi"
+        actions={[
+            {
+                href: featuredBook ? `/books/${toSlug(featuredBook.title)}` : "/books",
+                label: "Read the latest book →",
+                variant: "primary",
+            },
+            { href: "/about", label: "About", variant: "ghost" },
+        ]}
+    />
 
-    <!-- <MediaLogoWall /> -->
-    <section class="section featured-book">
-        <InfiniteScrollingLogosAnimation /> 
-    </section>
+    {publications.length > 0 && <PressMarquee publications={publications} />}
 
+    {featuredBook && (
+        <section class="home-section featured-book">
+            <div class="container featured-book-grid">
+                <a href={`/books/${toSlug(featuredBook.title)}`} class="featured-book-cover">
+                    <img src={featuredBook.coverImage?.url} alt={featuredBook.title} loading="lazy" />
+                </a>
+                <div class="featured-book-copy">
+                    <p class="eyebrow">The Latest · Non-fiction</p>
+                    <h2>{featuredBook.title}</h2>
+                    {featuredBook.subtitle && <p class="subtitle">{featuredBook.subtitle}</p>}
+                    {featuredBook.excerpt && <p class="desc">{featuredBook.excerpt}</p>}
+                    <dl class="featured-book-meta">
+                        <div>
+                            <dt>Publisher</dt>
+                            <strong>{featuredBook.publisher}</strong>
+                        </div>
+                        <div>
+                            <dt>Year</dt>
+                            <strong>{new Date(featuredBook.releaseDate).getFullYear()}</strong>
+                        </div>
+                        {featuredBook.isbn && (
+                            <div>
+                                <dt>ISBN</dt>
+                                <strong>{featuredBook.isbn}</strong>
+                            </div>
+                        )}
+                    </dl>
+                    <div class="featured-book-actions">
+                        <a href={`/books/${toSlug(featuredBook.title)}`} class="btn btn-primary">Read more →</a>
+                        <a href="/books" class="btn btn-ghost">All books</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    )}
 
-
-    <section class="section featured-book">
+    <section class="home-section latest-writing">
         <div class="container">
-            <h2 class="section-heading">Featured Work</h2>
-            <div class="featured-book-content">
-                <div class="featured-book-image">
-                    <img
-                        src={featuredBook.data.coverImage}
-                        alt={featuredBook.data.title}
+            <header class="latest-header">
+                <h2>Latest</h2>
+                <a href="/articles" class="latest-link">View all →</a>
+            </header>
+            <div class="latest-grid">
+                {latestArticles.map((article) => (
+                    <ImageContentCard
+                        href={article.url}
+                        external={true}
+                        title={article.title}
+                        imageSrc={article.image}
+                        imageAlt={article.title}
+                        eyebrow={article.platform}
+                        subtitle={article.excerpt}
+                        metaLeft={article.date.toLocaleDateString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                        })}
+                        metaRight={article.tags?.[0] ?? "Article"}
                     />
-                </div>
-                <div class="featured-book-info">
-                    <h3>{featuredBook.data.title}</h3>
-                    <p class="book-subtitle">{featuredBook.data.subtitle}</p>
-                    <p class="book-desc">{featuredBook.data.description}</p>
-                    <a href={`/books/${featuredBook.slug}`} class="btn"
-                        >Read More</a
-                    >
-                </div>
+                ))}
             </div>
         </div>
     </section>
 
-    <HomeBlogSection />
-
-    <section class="section newsletter-signup">
+    <section class="home-section home-section--tight">
         <div class="container">
-            <div class="newsletter-box">
-                <h3>Stay Updated</h3>
-                <p>
-                    Join the newsletter for updates on new writing, events, and
-                    research.
-                </p>
-                <form class="newsletter-form">
-                    <input
-                        type="email"
-                        placeholder="Your email address"
-                        required
-                    />
-                    <button type="submit" class="btn">Subscribe</button>
-                </form>
+            <div class="figures">
+                {figures.map((figure) => (
+                    <div class="figure">
+                        <span class="value">{figure.value}</span>
+                        <span class="label">{figure.label}</span>
+                    </div>
+                ))}
             </div>
         </div>
     </section>
 </BaseLayout>
 
 <style>
-    .intro-text {
-        font-size: 1.1rem;
-        margin-bottom: var(--spacing-lg);
-        max-width: 50ch;
+    .home-section {
+        padding: clamp(3rem, 6vw, 5rem) 0;
     }
 
-    .hero-cta {
-        display: flex;
-        gap: var(--spacing-md);
+    .home-section--tight {
+        padding: clamp(2.25rem, 4vw, 3.5rem) 0;
     }
 
-    .hero-cta {
-        display: flex;
-        gap: var(--spacing-md);
+    .featured-book {
+        background: var(--paper-soft);
+        border-bottom: 1px solid var(--rule-soft);
     }
 
-    .featured-book-content {
+    .featured-book-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: var(--spacing-xl);
-        align-items: center;
+        grid-template-columns: minmax(240px, 340px) 1fr;
+        gap: clamp(1.75rem, 4vw, 3.25rem);
+        align-items: start;
     }
 
-    .featured-book-image img {
-        max-width: 300px;
-        margin: 0 auto;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    .featured-book-cover {
+        aspect-ratio: 2 / 3;
+        background: var(--paper-deep);
+        border: 1px solid var(--ink);
+        overflow: hidden;
+        display: block;
+        padding: 0.4rem;
     }
 
-    .book-subtitle {
-        font-family: var(--font-sans);
-        font-size: 1.2rem;
-        color: var(--color-accent);
-        margin-bottom: var(--spacing-md);
+    .featured-book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: var(--paper);
     }
 
-    .book-desc {
-        margin-bottom: var(--spacing-lg);
+    .featured-book-copy h2 {
+        margin: 0.9rem 0 0.75rem;
+        font-size: clamp(2rem, 4.5vw, 3.75rem);
+        line-height: 1;
     }
 
-    .newsletter-box {
-        background-color: var(--color-bg-dark);
-        color: var(--color-text-dark);
-        padding: var(--spacing-xl);
-        text-align: center;
-        border-radius: 8px;
+    .featured-book-copy .subtitle {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-mid);
+        font-size: clamp(1rem, 1.6vw, 1.2rem);
     }
 
-    .newsletter-form {
+    .featured-book-copy .desc {
+        color: var(--ink-mid);
+        margin-top: 0.9rem;
+        line-height: 1.72;
+        max-width: 56ch;
+    }
+
+    .featured-book-meta {
         display: flex;
-        gap: var(--spacing-sm);
-        justify-content: center;
-        margin-top: var(--spacing-lg);
+        gap: clamp(1rem, 2vw, 2rem);
+        margin: 1.25rem 0;
         flex-wrap: wrap;
     }
 
-    .newsletter-form input {
-        padding: 0.75rem;
-        border: none;
-        border-radius: 4px;
-        min-width: 300px;
+    .featured-book-meta dt {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
     }
 
-    @media (max-width: 768px) {
-        .featured-book-content {
+    .featured-book-meta strong {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        color: var(--ink);
+        margin-top: 0.35rem;
+        font-weight: 500;
+    }
+
+    .featured-book-actions {
+        display: flex;
+        gap: 0.875rem;
+        flex-wrap: wrap;
+    }
+
+    .latest-writing {
+        border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .latest-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 1rem;
+        padding-bottom: 1.2rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .latest-header h2 {
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        line-height: 1;
+    }
+
+    .latest-link {
+        margin-left: auto;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-mid);
+    }
+
+    .latest-link:hover {
+        color: var(--ink);
+    }
+
+    .latest-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.25rem;
+    }
+
+    .figures {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        border-top: 1px solid var(--ink);
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .figure {
+        padding: 2rem 1.25rem;
+        border-right: 1px solid var(--rule-soft);
+    }
+
+    .figure:last-child {
+        border-right: 0;
+    }
+
+    .figure .value {
+        font-family: var(--font-display);
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.03em;
+    }
+
+    .figure .label {
+        display: block;
+        margin-top: 0.875rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+    }
+
+    @media (max-width: 1024px) {
+        .latest-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 900px) {
+        .featured-book-grid {
             grid-template-columns: 1fr;
-            text-align: center;
         }
 
-        .hero-cta {
-            justify-content: center;
+        .featured-book-cover {
+            max-width: 280px;
+        }
+    }
+
+    @media (max-width: 680px) {
+        .latest-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>

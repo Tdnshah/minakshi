@@ -1,0 +1,46 @@
+---
+interface Award {
+    /** Material Symbols icon name, e.g. "workspace_premium" */
+    icon: string;
+    title: string;
+    subtitle: string;
+}
+
+interface Props {
+    sectionTitle: string;
+    awards: Award[];
+    decorativeBgSrc?: string;
+    decorativeBgAlt?: string;
+}
+
+const {
+    sectionTitle,
+    awards,
+    decorativeBgSrc,
+    decorativeBgAlt = 'Decorative botanical illustration',
+} = Astro.props;
+---
+
+<section class="py-24 bg-primary-container text-on-primary px-12 relative overflow-hidden">
+    {decorativeBgSrc && (
+        <div class="absolute -left-20 bottom-0 opacity-10 w-96 h-96">
+            <img class="w-full h-full object-contain" src={decorativeBgSrc} alt={decorativeBgAlt} />
+        </div>
+    )}
+
+    <div class="max-w-screen-2xl mx-auto text-center">
+        <h2 class="text-4xl font-headline mb-16">{sectionTitle}</h2>
+
+        <div class="flex flex-wrap justify-center gap-16">
+            {awards.map((award) => (
+                <div class="flex flex-col items-center">
+                    <div class="w-24 h-24 border-2 border-secondary rounded-full flex items-center justify-center mb-6">
+                        <span class="material-symbols-outlined text-4xl text-secondary">{award.icon}</span>
+                    </div>
+                    <span class="font-headline text-xl">{award.title}</span>
+                    <span class="text-on-primary-container text-sm">{award.subtitle}</span>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>

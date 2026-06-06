@@ -206,11 +206,10 @@ export interface Podcast {
   id: number;
   title: string;
   url: string;
-  publishedAt: string;
   platform: string;
-  duration?: string | null;
+  publishedAt: string;
   description?: string | null;
-  thumbnail?: string | null;
+  slug?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -222,6 +221,10 @@ export interface Book {
   id: number;
   title: string;
   subtitle?: string | null;
+  /**
+   * Short blurb shown in the hero section and book listings (2–4 sentences).
+   */
+  excerpt?: string | null;
   description: {
     root: {
       type: string;
@@ -248,6 +251,22 @@ export interface Book {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Awards, shortlists, and recognitions the book has received.
+   */
+  awards?:
+    | {
+        title: string;
+        organization: string;
+        year?: number | null;
+        status?: ('winner' | 'shortlisted' | 'longlisted' | 'nominated') | null;
+        /**
+         * Link for more info (optional).
+         */
+        url?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   reviews?:
     | {
         quote: string;
@@ -266,16 +285,30 @@ export interface Book {
         id?: string | null;
       }[]
     | null;
-  eventGallery?:
+  /**
+   * Book talks, signings, launches, and other events.
+   */
+  bookEvents?:
     | {
-        image?: (number | null) | Media;
+        name: string;
+        date: string;
+        venue?: string | null;
+        city?: string | null;
+        description?: string | null;
+        /**
+         * Optional link to event page or recording.
+         */
+        url?: string | null;
         id?: string | null;
       }[]
     | null;
-  bookKits?:
+  eventGallery?:
     | {
-        label: string;
-        url: string;
+        image?: (number | null) | Media;
+        /**
+         * Optional caption for this photo.
+         */
+        caption?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -368,8 +401,9 @@ export interface Film {
  */
 export interface Consulting {
   id: number;
+  title: string;
   organisation: string;
-  year: string;
+  year?: string | null;
   description: string;
   domain: {
     domainName: string;
@@ -554,11 +588,10 @@ export interface ArticlesSelect<T extends boolean = true> {
 export interface PodcastsSelect<T extends boolean = true> {
   title?: T;
   url?: T;
-  publishedAt?: T;
   platform?: T;
-  duration?: T;
+  publishedAt?: T;
   description?: T;
-  thumbnail?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -569,6 +602,7 @@ export interface PodcastsSelect<T extends boolean = true> {
 export interface BooksSelect<T extends boolean = true> {
   title?: T;
   subtitle?: T;
+  excerpt?: T;
   description?: T;
   coverImage?: T;
   isbn?: T;
@@ -578,6 +612,16 @@ export interface BooksSelect<T extends boolean = true> {
     | T
     | {
         store?: T;
+        url?: T;
+        id?: T;
+      };
+  awards?:
+    | T
+    | {
+        title?: T;
+        organization?: T;
+        year?: T;
+        status?: T;
         url?: T;
         id?: T;
       };
@@ -599,17 +643,22 @@ export interface BooksSelect<T extends boolean = true> {
         date?: T;
         id?: T;
       };
+  bookEvents?:
+    | T
+    | {
+        name?: T;
+        date?: T;
+        venue?: T;
+        city?: T;
+        description?: T;
+        url?: T;
+        id?: T;
+      };
   eventGallery?:
     | T
     | {
         image?: T;
-        id?: T;
-      };
-  bookKits?:
-    | T
-    | {
-        label?: T;
-        url?: T;
+        caption?: T;
         id?: T;
       };
   updatedAt?: T;
@@ -682,6 +731,7 @@ export interface FilmsSelect<T extends boolean = true> {
  * via the `definition` "consulting_select".
  */
 export interface ConsultingSelect<T extends boolean = true> {
+  title?: T;
   organisation?: T;
   year?: T;
   description?: T;

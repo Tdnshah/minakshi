@@ -22,13 +22,14 @@ const { title, description } = Astro.props;
     .back-link {
         display: inline-block;
         margin: var(--spacing-md) 0;
-        font-size: 0.9rem;
-        color: var(--color-text-light);
-        opacity: 0.7;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
     }
 
     .back-link:hover {
-        opacity: 1;
-        color: var(--color-accent);
+        color: var(--accent);
     }
 </style>

@@ -1,0 +1,139 @@
+---
+interface Props {
+    href: string;
+    title: string;
+    imageSrc?: string;
+    imageAlt?: string;
+    eyebrow?: string;
+    subtitle?: string;
+    metaLeft?: string;
+    metaRight?: string;
+    external?: boolean;
+}
+
+const {
+    href,
+    title,
+    imageSrc,
+    imageAlt = title,
+    eyebrow,
+    subtitle,
+    metaLeft,
+    metaRight,
+    external = false,
+} = Astro.props;
+---
+
+<a
+    href={href}
+    class="image-card"
+    target={external ? "_blank" : undefined}
+    rel={external ? "noopener noreferrer" : undefined}
+>
+    <div class="image-card-cover">
+        {imageSrc ? (
+            <img src={imageSrc} alt={imageAlt} loading="lazy" />
+        ) : (
+            <div class="image-card-placeholder" aria-hidden="true" />
+        )}
+    </div>
+    <div class="image-card-content">
+        {eyebrow && <span class="image-card-eyebrow">{eyebrow}</span>}
+        <h3 class="image-card-title">{title}</h3>
+        {subtitle && <p class="image-card-subtitle">{subtitle}</p>}
+        {(metaLeft || metaRight) && (
+            <div class="image-card-meta">
+                <span>{metaLeft}</span>
+                <span>{metaRight}</span>
+            </div>
+        )}
+    </div>
+</a>
+
+<style>
+    .image-card {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+        padding: 1.25rem;
+        background: var(--paper-soft);
+        border: 1px solid var(--rule-soft);
+        transition: border-color 240ms var(--ease-editorial), transform 240ms var(--ease-editorial), background 240ms var(--ease-editorial);
+    }
+
+    .image-card:hover {
+        background: var(--paper);
+        border-color: var(--ink);
+        transform: translateY(-3px);
+    }
+
+    .image-card-cover {
+        aspect-ratio: 2 / 3;
+        background: var(--paper-deep);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .image-card-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 380ms var(--ease-editorial);
+    }
+
+    .image-card:hover .image-card-cover img {
+        transform: scale(1.03);
+    }
+
+    .image-card-placeholder {
+        width: 100%;
+        height: 100%;
+        background: var(--paper-deep);
+    }
+
+    .image-card-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+        min-height: 9rem;
+    }
+
+    .image-card-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+
+    .image-card-title {
+        font-family: var(--font-display);
+        font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        color: var(--ink);
+        line-height: 1.25;
+    }
+
+    .image-card-subtitle {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-mid);
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+
+    .image-card-meta {
+        margin-top: auto;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--rule-soft);
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--ink-soft);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+</style>
