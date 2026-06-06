@@ -1,0 +1,39 @@
+---
+import FeaturedBook from "../system/FeaturedBook.astro";
+import { toSlug } from "../../lib/payload/books";
+import type { FeaturedBookBlockData } from "./types";
+
+type Props = FeaturedBookBlockData;
+
+const {
+    book,
+    eyebrow,
+    primaryActionLabel = "Read more →",
+    secondaryActionLabel = "All books",
+    secondaryActionHref = "/books",
+} = Astro.props;
+
+// Guard: if Payload returned an unpopulated ID string (depth=0), skip render.
+const populated = typeof book === "object" && book !== null;
+---
+
+{populated && (
+    <FeaturedBook
+        eyebrow={eyebrow}
+        title={book.title}
+        subtitle={book.subtitle}
+        excerpt={book.excerpt}
+        coverSrc={book.coverImage?.url}
+        coverAlt={book.title}
+        coverHref={`/books/${toSlug(book.title)}`}
+        meta={[
+            { label: "Publisher", value: book.publisher },
+            { label: "Year", value: new Date(book.releaseDate).getFullYear() },
+            ...(book.isbn ? [{ label: "ISBN", value: book.isbn }] : []),
+        ]}
+        actions={[
+            { href: `/books/${toSlug(book.title)}`, label: primaryActionLabel, variant: "primary" },
+            { href: secondaryActionHref, label: secondaryActionLabel, variant: "ghost" },
+        ]}
+    />
+)}

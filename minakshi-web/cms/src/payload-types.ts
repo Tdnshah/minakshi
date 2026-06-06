@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    pages: Page;
     articles: Article;
     podcasts: Podcast;
     books: Book;
@@ -86,6 +87,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     podcasts: PodcastsSelect<false> | PodcastsSelect<true>;
     books: BooksSelect<false> | BooksSelect<true>;
@@ -179,37 +181,104 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "articles".
+ * via the `definition` "pages".
  */
-export interface Article {
+export interface Page {
   id: number;
+  /**
+   * Internal title (also used for the browser tab unless meta.title is set).
+   */
   title: string;
-  platform: string;
-  url: string;
-  date: string;
-  excerpt: string;
-  image?: string | null;
-  tags?:
+  /**
+   * URL path segment. Use "home" for the homepage. Use forward slashes for nested paths (e.g. "about/team").
+   */
+  slug: string;
+  meta?: {
+    /**
+     * Overrides the tab title.
+     */
+    title?: string | null;
+    description?: string | null;
+    ogImage?: (number | null) | Media;
+  };
+  blocks: (
     | {
-        tag?: string | null;
+        eyebrow: string;
+        firstName: string;
+        lastName: string;
+        description: string;
+        roles: {
+          label: string;
+          id?: string | null;
+        }[];
+        portraitImage: number | Media;
+        portraitCaption?: string | null;
+        actions?:
+          | {
+              label: string;
+              href: string;
+              variant?: ('primary' | 'ghost') | null;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "podcasts".
- */
-export interface Podcast {
-  id: number;
-  title: string;
-  url: string;
-  platform: string;
-  publishedAt: string;
-  description?: string | null;
-  slug?: string | null;
+        blockName?: string | null;
+        blockType: 'hero';
+      }
+    | {
+        /**
+         * Publication names that scroll across the strip.
+         */
+        publications: {
+          name: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'pressMarquee';
+      }
+    | {
+        /**
+         * Pick the book to spotlight.
+         */
+        book: number | Book;
+        eyebrow?: string | null;
+        primaryActionLabel?: string | null;
+        secondaryActionLabel?: string | null;
+        secondaryActionHref?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'featuredBook';
+      }
+    | {
+        heading: string;
+        /**
+         * Pick the articles to feature (recommended: 3).
+         */
+        articles: (number | Article)[];
+        viewAllLabel?: string | null;
+        viewAllHref?: string | null;
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'latestArticles';
+      }
+    | {
+        items: {
+          /**
+           * e.g. "20+", "4"
+           */
+          value: string;
+          /**
+           * e.g. "Years of fieldwork"
+           */
+          label: string;
+          id?: string | null;
+        }[];
+        id?: string | null;
+        blockName?: string | null;
+        blockType: 'figures';
+      }
+  )[];
   updatedAt: string;
   createdAt: string;
 }
@@ -312,6 +381,42 @@ export interface Book {
         id?: string | null;
       }[]
     | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: number;
+  title: string;
+  platform: string;
+  url: string;
+  date: string;
+  excerpt: string;
+  image?: string | null;
+  tags?:
+    | {
+        tag?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "podcasts".
+ */
+export interface Podcast {
+  id: number;
+  title: string;
+  url: string;
+  platform: string;
+  publishedAt: string;
+  description?: string | null;
+  slug?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -445,6 +550,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
         relationTo: 'articles';
         value: number | Article;
       } | null)
@@ -560,6 +669,99 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  blocks?:
+    | T
+    | {
+        hero?:
+          | T
+          | {
+              eyebrow?: T;
+              firstName?: T;
+              lastName?: T;
+              description?: T;
+              roles?:
+                | T
+                | {
+                    label?: T;
+                    id?: T;
+                  };
+              portraitImage?: T;
+              portraitCaption?: T;
+              actions?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    variant?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        pressMarquee?:
+          | T
+          | {
+              publications?:
+                | T
+                | {
+                    name?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        featuredBook?:
+          | T
+          | {
+              book?: T;
+              eyebrow?: T;
+              primaryActionLabel?: T;
+              secondaryActionLabel?: T;
+              secondaryActionHref?: T;
+              id?: T;
+              blockName?: T;
+            };
+        latestArticles?:
+          | T
+          | {
+              heading?: T;
+              articles?: T;
+              viewAllLabel?: T;
+              viewAllHref?: T;
+              id?: T;
+              blockName?: T;
+            };
+        figures?:
+          | T
+          | {
+              items?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

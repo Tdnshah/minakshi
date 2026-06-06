@@ -68,3 +68,62 @@ The objective is an enterprise-grade, reusable, data-driven design system with:
 - No regressions in top-level routes.
 - Heading primitives used consistently in updated pages.
 
+
+---
+
+# Phase 2 — Payload Page Builder
+
+## Decision 7: CMS-driven pages via a `Pages` collection
+**Decision:** All marketing/content pages are composed in Payload as ordered block lists in a single `pages` collection.
+
+**Why:**
+- Editors compose layouts visually without dev help.
+- One source of truth for page structure and SEO meta.
+- Detail pages for collections (`/books/:slug`, `/articles/:slug`) remain in Astro because they are templated per-entity, not free-form.
+
+## Decision 8: Routing via catch-all `[...slug].astro`
+**Decision:** A single catch-all route resolves any Page from the CMS by slug.
+
+**Rules:**
+- `/` → page with slug `home` (required; site won't render `/` without it).
+- `/about` → page with slug `about`. Existing static `about.astro` etc. take precedence until migrated.
+- Nested slugs (`/team/contact`) supported.
+- 404 returned when no Page matches.
+
+## Decision 9: Block adapter pattern (CMS ↔ Astro)
+**Decision:** Payload blocks are mapped to Astro adapters that translate CMS props into pure presentational primitives.
+
+```
+cms/src/blocks/<Name>/config.ts        // Payload block schema
+app/src/components/blocks/<Name>Block.astro   // adapter (CMS-aware)
+app/src/components/system/<Name>.astro        // primitive (CMS-agnostic, reusable)
+```
+
+**Why (SOLID):**
+- **SRP:** Adapters only do CMS→props translation; primitives only render.
+- **OCP:** New blocks added by creating two files + one registry entry; no edits to existing code.
+- **DIP:** Primitives depend on plain TypeScript interfaces, not Payload types.
+- **DRY:** Primitives reused on non-CMS routes (e.g., book detail pages reuse `FeaturedBook`).
+
+## Decision 10: Block registry (`BlockRenderer`)
+**Decision:** `components/blocks/BlockRenderer.astro` holds a `Record<blockType, Adapter>` and iterates the page's blocks list.
+
+- Unknown `blockType` is logged in dev and skipped — never crashes the page.
+- Adding a block = three steps (CMS config, Astro adapter, registry entry).
+
+## Phase 2 block library (initial set)
+| Block         | CMS slug          | Astro adapter              | Primitive                  |
+|---------------|-------------------|----------------------------|----------------------------|
+| Hero          | `hero`            | `HeroBlock.astro`          | `system/HomeHero.astro`    |
+| Press Marquee | `pressMarquee`    | `PressMarqueeBlock.astro`  | `system/PressMarquee.astro`|
+| Featured Book | `featuredBook`    | `FeaturedBookBlock.astro`  | `system/FeaturedBook.astro`|
+| Latest Articles | `latestArticles`| `LatestArticlesBlock.astro`| (uses `ImageContentCard`)  |
+| Figures       | `figures`         | `FiguresBlock.astro`       | `system/Figures.astro`     |
+
+## How to add a new block (4-step recipe)
+1. **CMS schema:** create `cms/src/blocks/<Name>/config.ts` exporting a `Block` with `slug` + `fields`.
+2. **Register in CMS:** import + push to `cms/src/blocks/index.ts`. Run a Payload migration.
+3. **Astro types:** add an interface to `app/src/components/blocks/types.ts` (`blockType` matches the slug).
+4. **Astro adapter:** create `app/src/components/blocks/<Name>Block.astro` that translates props → a system primitive. Register it in `BlockRenderer.astro`'s `REGISTRY` map.
+
+That's it. Existing pages and blocks remain untouched.

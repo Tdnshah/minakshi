@@ -1,0 +1,35 @@
+---
+import HomeHero from "../system/HomeHero.astro";
+import type { HeroBlockData } from "./types";
+
+type Props = HeroBlockData;
+
+const {
+    eyebrow,
+    firstName,
+    lastName,
+    description,
+    roles,
+    portraitImage,
+    portraitCaption,
+    actions = [],
+} = Astro.props;
+
+const roleLabels = roles.map((r) => r.label);
+---
+
+<HomeHero
+    eyebrow={eyebrow}
+    firstName={firstName}
+    lastName={lastName}
+    description={description}
+    roles={roleLabels}
+    portraitSrc={portraitImage?.url ?? ""}
+    portraitAlt={portraitImage?.alt ?? `Portrait of ${firstName} ${lastName}`}
+    portraitCaption={portraitCaption}
+    actions={actions.map((a) => ({
+        href: a.href,
+        label: a.label,
+        variant: a.variant ?? "primary",
+    }))}
+/>
