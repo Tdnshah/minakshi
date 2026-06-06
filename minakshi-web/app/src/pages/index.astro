@@ -108,6 +108,7 @@ const figures = [
                     <ImageContentCard
                         href={article.url}
                         external={true}
+                        variant="article"
                         title={article.title}
                         imageSrc={article.image}
                         imageAlt={article.title}
@@ -245,12 +246,12 @@ const figures = [
     }
 
     .latest-link {
-        margin-left: auto;
         font-family: var(--font-mono);
         font-size: 0.75rem;
         letter-spacing: 0.14em;
         text-transform: uppercase;
         color: var(--ink-mid);
+        transition: color 200ms var(--ease-editorial);
     }
 
     .latest-link:hover {
@@ -260,7 +261,7 @@ const figures = [
     .latest-grid {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1.25rem;
+        gap: clamp(1.25rem, 2.25vw, 2rem);
     }
 
     .figures {
