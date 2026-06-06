@@ -1,0 +1,10 @@
+---
+import Figures from "../system/Figures.astro";
+import type { FiguresBlockData } from "./types";
+
+type Props = FiguresBlockData;
+
+const { items } = Astro.props;
+---
+
+{items.length > 0 && <Figures items={items} />}

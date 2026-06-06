@@ -1,0 +1,32 @@
+---
+/**
+ * Catch-all route for CMS-driven pages.
+ *
+ *   "/"               -> Page with slug "home"
+ *   "/about"          -> Page with slug "about"
+ *   "/team/contact"   -> Page with slug "team/contact"
+ *
+ * Returns 404 when no Page matches.
+ */
+export const prerender = false;
+
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BlockRenderer from "../components/blocks/BlockRenderer.astro";
+import { fetchPageBySlug } from "../lib/payload/pages";
+
+const { slug } = Astro.params;
+const resolvedSlug = !slug || slug === "" ? "home" : Array.isArray(slug) ? slug.join("/") : slug;
+
+const page = await fetchPageBySlug(resolvedSlug);
+
+if (!page) {
+    return new Response(null, { status: 404, statusText: "Not Found" });
+}
+
+const tabTitle = page.meta?.title ?? page.title;
+const description = page.meta?.description;
+---
+
+<BaseLayout title={tabTitle} description={description}>
+    <BlockRenderer blocks={page.blocks} />
+</BaseLayout>

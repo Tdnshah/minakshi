@@ -1,0 +1,46 @@
+---
+/**
+ * BlockRenderer — renders an ordered list of Payload page-builder blocks.
+ *
+ * Registry pattern (Open/Closed): adding a new block requires only:
+ *   1. Create cms/src/blocks/<Name>/config.ts (CMS schema)
+ *   2. Create components/blocks/<Name>Block.astro (Astro adapter)
+ *   3. Add a row to REGISTRY below
+ *
+ * Existing blocks are not touched. Unknown blocks are skipped (with a console
+ * warning in dev) so a missing adapter never breaks the page.
+ */
+import HeroBlock from "./HeroBlock.astro";
+import PressMarqueeBlock from "./PressMarqueeBlock.astro";
+import FeaturedBookBlock from "./FeaturedBookBlock.astro";
+import LatestArticlesBlock from "./LatestArticlesBlock.astro";
+import FiguresBlock from "./FiguresBlock.astro";
+import type { PageBlock } from "./types";
+
+interface Props {
+    blocks: PageBlock[];
+}
+
+const { blocks = [] } = Astro.props;
+
+const REGISTRY = {
+    hero: HeroBlock,
+    pressMarquee: PressMarqueeBlock,
+    featuredBook: FeaturedBookBlock,
+    latestArticles: LatestArticlesBlock,
+    figures: FiguresBlock,
+} as const;
+---
+
+{
+    blocks.map((block) => {
+        const Component = REGISTRY[block.blockType as keyof typeof REGISTRY];
+        if (!Component) {
+            if (import.meta.env.DEV) {
+                console.warn(`[BlockRenderer] No adapter registered for blockType="${block.blockType}"`);
+            }
+            return null;
+        }
+        return <Component {...(block as any)} />;
+    })
+}

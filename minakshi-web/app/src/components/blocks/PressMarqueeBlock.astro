@@ -1,0 +1,11 @@
+---
+import PressMarquee from "../system/PressMarquee.astro";
+import type { PressMarqueeBlockData } from "./types";
+
+type Props = PressMarqueeBlockData;
+
+const { publications } = Astro.props;
+const names = publications.map((p) => p.name).filter(Boolean);
+---
+
+{names.length > 0 && <PressMarquee publications={names} />}
