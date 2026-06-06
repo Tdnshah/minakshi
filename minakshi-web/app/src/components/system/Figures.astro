@@ -1,0 +1,69 @@
+---
+/**
+ * Figures primitive — key statistics strip.
+ * Pure presentational; consumed by FiguresBlock adapter.
+ */
+interface Figure {
+    value: string;
+    label: string;
+}
+
+interface Props {
+    items: Figure[];
+}
+
+const { items } = Astro.props;
+---
+
+<section class="home-section home-section--tight">
+    <div class="container">
+        <div class="figures">
+            {items.map((figure) => (
+                <div class="figure">
+                    <span class="value">{figure.value}</span>
+                    <span class="label">{figure.label}</span>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+    .home-section--tight {
+        padding: clamp(2.25rem, 4vw, 3.5rem) 0;
+    }
+
+    .figures {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        border-top: 1px solid var(--ink);
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .figure {
+        padding: 2rem 1.25rem;
+        border-right: 1px solid var(--rule-soft);
+    }
+
+    .figure:last-child {
+        border-right: 0;
+    }
+
+    .figure .value {
+        font-family: var(--font-display);
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 500;
+        line-height: 1;
+        letter-spacing: -0.03em;
+    }
+
+    .figure .label {
+        display: block;
+        margin-top: 0.875rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+    }
+</style>

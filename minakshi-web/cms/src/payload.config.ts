@@ -12,6 +12,7 @@ import { Research } from './collections/Research';
 import { Conferences } from './collections/Conferences';
 import { Films } from './collections/Films';
 import { Consulting } from './collections/Consulting';
+import { Pages } from './collections/Pages';
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -30,6 +31,7 @@ export default buildConfig({
   collections: [
     Users, 
     Media,
+    Pages,
     Articles,
     Podcasts,
     Books,

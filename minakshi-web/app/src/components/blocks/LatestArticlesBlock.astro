@@ -1,0 +1,104 @@
+---
+import ImageContentCard from "../system/ImageContentCard.astro";
+import type { LatestArticlesBlockData } from "./types";
+
+type Props = LatestArticlesBlockData;
+
+const {
+    heading,
+    articles,
+    viewAllLabel = "View all →",
+    viewAllHref = "/articles",
+} = Astro.props;
+
+// Keep only populated relationship objects (skip raw IDs if depth=0).
+const populated = articles.filter(
+    (a): a is Exclude<(typeof articles)[number], string> => typeof a === "object" && a !== null,
+);
+---
+
+{populated.length > 0 && (
+    <section class="home-section latest-writing">
+        <div class="container">
+            <header class="latest-header">
+                <h2>{heading}</h2>
+                <a href={viewAllHref} class="latest-link">{viewAllLabel}</a>
+            </header>
+            <div class="latest-grid">
+                {populated.map((article) => (
+                    <ImageContentCard
+                        href={article.url}
+                        external={true}
+                        variant="article"
+                        title={article.title}
+                        imageSrc={article.image}
+                        imageAlt={article.title}
+                        eyebrow={article.platform}
+                        subtitle={article.excerpt}
+                        metaLeft={new Date(article.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                        })}
+                        metaRight={article.tags?.[0]?.tag ?? "Article"}
+                    />
+                ))}
+            </div>
+        </div>
+    </section>
+)}
+
+<style>
+    .home-section {
+        padding: clamp(3rem, 6vw, 5rem) 0;
+    }
+
+    .latest-writing {
+        border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .latest-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 1rem;
+        padding-bottom: 1.2rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .latest-header h2 {
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        line-height: 1;
+    }
+
+    .latest-link {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-mid);
+        transition: color 200ms var(--ease-editorial);
+    }
+
+    .latest-link:hover {
+        color: var(--ink);
+    }
+
+    .latest-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: clamp(1.25rem, 2.25vw, 2rem);
+    }
+
+    @media (max-width: 1024px) {
+        .latest-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 680px) {
+        .latest-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

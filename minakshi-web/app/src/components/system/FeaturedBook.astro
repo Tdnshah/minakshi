@@ -1,0 +1,176 @@
+---
+/**
+ * FeaturedBook primitive — editorial spotlight panel for a single book.
+ * Pure presentational; consumed by FeaturedBookBlock adapter or directly on book pages.
+ */
+interface MetaItem {
+    label: string;
+    value: string | number;
+}
+
+interface ActionLink {
+    href: string;
+    label: string;
+    variant?: "primary" | "ghost";
+}
+
+interface Props {
+    eyebrow?: string;
+    title: string;
+    subtitle?: string;
+    excerpt?: string;
+    coverSrc?: string;
+    coverAlt?: string;
+    coverHref?: string;
+    meta?: MetaItem[];
+    actions?: ActionLink[];
+}
+
+const {
+    eyebrow = "The Latest · Non-fiction",
+    title,
+    subtitle,
+    excerpt,
+    coverSrc,
+    coverAlt = title,
+    coverHref,
+    meta = [],
+    actions = [],
+} = Astro.props;
+---
+
+<section class="home-section featured-book">
+    <div class="container featured-book-grid">
+        {coverHref ? (
+            <a href={coverHref} class="featured-book-cover">
+                {coverSrc && <img src={coverSrc} alt={coverAlt} loading="lazy" />}
+            </a>
+        ) : (
+            <div class="featured-book-cover">
+                {coverSrc && <img src={coverSrc} alt={coverAlt} loading="lazy" />}
+            </div>
+        )}
+        <div class="featured-book-copy">
+            {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+            <h2>{title}</h2>
+            {subtitle && <p class="subtitle">{subtitle}</p>}
+            {excerpt && <p class="desc">{excerpt}</p>}
+            {meta.length > 0 && (
+                <dl class="featured-book-meta">
+                    {meta.map((item) => (
+                        <div>
+                            <dt>{item.label}</dt>
+                            <strong>{item.value}</strong>
+                        </div>
+                    ))}
+                </dl>
+            )}
+            {actions.length > 0 && (
+                <div class="featured-book-actions">
+                    {actions.map((a) => (
+                        <a
+                            href={a.href}
+                            class={`btn ${a.variant === "ghost" ? "btn-ghost" : "btn-primary"}`}
+                        >
+                            {a.label}
+                        </a>
+                    ))}
+                </div>
+            )}
+        </div>
+    </div>
+</section>
+
+<style>
+    .home-section {
+        padding: clamp(3rem, 6vw, 5rem) 0;
+    }
+
+    .featured-book {
+        background: var(--paper-soft);
+        border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .featured-book-grid {
+        display: grid;
+        grid-template-columns: minmax(240px, 340px) 1fr;
+        gap: clamp(1.75rem, 4vw, 3.25rem);
+        align-items: start;
+    }
+
+    .featured-book-cover {
+        aspect-ratio: 2 / 3;
+        background: var(--paper-deep);
+        border: 1px solid var(--ink);
+        overflow: hidden;
+        display: block;
+        padding: 0.4rem;
+    }
+
+    .featured-book-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: var(--paper);
+    }
+
+    .featured-book-copy h2 {
+        margin: 0.9rem 0 0.75rem;
+        font-size: clamp(2rem, 4.5vw, 3.75rem);
+        line-height: 1;
+    }
+
+    .featured-book-copy .subtitle {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-mid);
+        font-size: clamp(1rem, 1.6vw, 1.2rem);
+    }
+
+    .featured-book-copy .desc {
+        color: var(--ink-mid);
+        margin-top: 0.9rem;
+        line-height: 1.72;
+        max-width: 56ch;
+    }
+
+    .featured-book-meta {
+        display: flex;
+        gap: clamp(1rem, 2vw, 2rem);
+        margin: 1.25rem 0;
+        flex-wrap: wrap;
+    }
+
+    .featured-book-meta dt {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+    }
+
+    .featured-book-meta strong {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 1.05rem;
+        color: var(--ink);
+        margin-top: 0.35rem;
+        font-weight: 500;
+    }
+
+    .featured-book-actions {
+        display: flex;
+        gap: 0.875rem;
+        flex-wrap: wrap;
+    }
+
+    @media (max-width: 900px) {
+        .featured-book-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .featured-book-cover {
+            max-width: 280px;
+        }
+    }
+</style>
