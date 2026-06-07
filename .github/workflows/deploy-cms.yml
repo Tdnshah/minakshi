@@ -14,7 +14,7 @@ on:
         required: false
         default: ""
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - "minakshi-web/cms/**"
       - ".github/workflows/deploy-cms.yml"
