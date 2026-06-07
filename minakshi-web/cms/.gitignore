@@ -51,3 +51,6 @@ node_modules/
 
 # Payload standalone build artifacts
 standalone/
+
+# Local build artifact produced by deploy/build-artifact.sh
+/cms-artifact/
