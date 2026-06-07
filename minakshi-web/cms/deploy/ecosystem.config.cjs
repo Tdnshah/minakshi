@@ -14,10 +14,7 @@ module.exports = {
   apps: [
     {
       name: 'payload-cms',
-      // pm2 always runs out of ~/cms/current (a symlink to releases/<ts>).
-      // The shared .env file lives at ~/cms/shared/.env and is symlinked
-      // into each release at deploy time.
-      cwd: '/home/minakshidewan/cms/current',
+      cwd: '/home/minakshidewan/domains/cms.minakshidewan.com/public_html',
       script: 'server.js',
       // Next.js standalone server.js respects PORT.
       args: [],
@@ -35,8 +32,8 @@ module.exports = {
       // Logs: written under ~/cms/logs/ (a symlink target inside each release's
       // logs/ dir would be created by post-deploy.sh, but to keep things
       // simple we just point at a path pm2 can write under the user's home).
-      out_file: '/home/minakshidewan/cms/logs/out.log',
-      error_file: '/home/minakshidewan/cms/logs/error.log',
+      out_file: '/home/minakshidewan/domains/cms.minakshidewan.com/logs/out.log',
+      error_file: '/home/minakshidewan/domains/cms.minakshidewan.com/logs/error.log',
       merge_logs: true,
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
       time: true,
