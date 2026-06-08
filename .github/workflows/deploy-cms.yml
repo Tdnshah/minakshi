@@ -87,7 +87,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           source: "${{ env.CMS_DIR }}/cms-artifact/."
           target: "~/domains/cms.minakshidewan.com/public_html/"
-          strip_components: 0
+          strip_components: 3
           command_timeout: 10m
           timeout: 10m
 
