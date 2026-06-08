@@ -30,8 +30,7 @@ log "Node:    $(node -v)"
 log "Payload: $(npx --no-install payload --version 2>/dev/null || echo 'unknown')"
 
 # `payload migrate` is idempotent — it only applies un-applied migrations.
-# --yes auto-confirms any interactive prompts (e.g. dev-mode schema detection).
 log "Running payload migrate"
-npx --no-install payload migrate --yes
+npx --no-install payload migrate
 
 log "Migrations complete"
