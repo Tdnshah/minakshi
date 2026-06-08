@@ -22,6 +22,11 @@ const dirname = path.dirname(filename)
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  cors: [
+    'https://minakshidewan.com',
+    'https://www.minakshidewan.com',
+    process.env.PAYLOAD_PUBLIC_SERVER_URL || 'http://localhost:3000',
+  ].filter(Boolean),
   admin: {
     user: Users.slug,
     importMap: {
