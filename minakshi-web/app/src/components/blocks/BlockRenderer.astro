@@ -15,6 +15,7 @@ import PressMarqueeBlock from "./PressMarqueeBlock.astro";
 import FeaturedBookBlock from "./FeaturedBookBlock.astro";
 import LatestArticlesBlock from "./LatestArticlesBlock.astro";
 import FiguresBlock from "./FiguresBlock.astro";
+import BooksGridBlock from "./BooksGridBlock.astro";
 import type { PageBlock } from "./types";
 
 interface Props {
@@ -29,6 +30,7 @@ const REGISTRY = {
     featuredBook: FeaturedBookBlock,
     latestArticles: LatestArticlesBlock,
     figures: FiguresBlock,
+    booksGrid: BooksGridBlock,
 } as const;
 ---
 

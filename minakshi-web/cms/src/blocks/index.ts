@@ -7,7 +7,8 @@ import { PressMarquee } from './PressMarquee/config';
 import { FeaturedBook } from './FeaturedBook/config';
 import { LatestArticles } from './LatestArticles/config';
 import { Figures } from './Figures/config';
+import { BooksGrid } from './BooksGrid/config';
 
-export const blocks = [Hero, PressMarquee, FeaturedBook, LatestArticles, Figures];
+export const blocks = [Hero, PressMarquee, FeaturedBook, LatestArticles, Figures, BooksGrid];
 
-export { Hero, PressMarquee, FeaturedBook, LatestArticles, Figures };
+export { Hero, PressMarquee, FeaturedBook, LatestArticles, Figures, BooksGrid };

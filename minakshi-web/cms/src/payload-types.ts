@@ -193,6 +193,16 @@ export interface Page {
    * URL path segment. Use "home" for the homepage. Use forward slashes for nested paths (e.g. "about/team").
    */
   slug: string;
+  /**
+   * Show this page in the site header navigation.
+   */
+  showInNavigation?: boolean | null;
+  /**
+   * Optional short label override for menu display. Defaults to title.
+   */
+  navigationLabel?: string | null;
+  navigationGroup?: ('primary' | 'myWorks' | 'media') | null;
+  navigationOrder?: number | null;
   meta?: {
     /**
      * Overrides the tab title.
@@ -201,84 +211,105 @@ export interface Page {
     description?: string | null;
     ogImage?: (number | null) | Media;
   };
-  blocks: (
-    | {
-        eyebrow: string;
-        firstName: string;
-        lastName: string;
-        description: string;
-        roles: {
-          label: string;
-          id?: string | null;
-        }[];
-        portraitImage: number | Media;
-        portraitCaption?: string | null;
-        actions?:
-          | {
+  /**
+   * Optional page-builder blocks. Leave empty when this slug should resolve to an Astro file-based page.
+   */
+  blocks?:
+    | (
+        | {
+            eyebrow: string;
+            firstName: string;
+            lastName: string;
+            description: string;
+            roles: {
               label: string;
-              href: string;
-              variant?: ('primary' | 'ghost') | null;
               id?: string | null;
-            }[]
-          | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'hero';
-      }
-    | {
-        /**
-         * Publication names that scroll across the strip.
-         */
-        publications: {
-          name: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'pressMarquee';
-      }
-    | {
-        /**
-         * Pick the book to spotlight.
-         */
-        book: number | Book;
-        eyebrow?: string | null;
-        primaryActionLabel?: string | null;
-        secondaryActionLabel?: string | null;
-        secondaryActionHref?: string | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'featuredBook';
-      }
-    | {
-        heading: string;
-        /**
-         * Pick the articles to feature (recommended: 3).
-         */
-        articles: (number | Article)[];
-        viewAllLabel?: string | null;
-        viewAllHref?: string | null;
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'latestArticles';
-      }
-    | {
-        items: {
-          /**
-           * e.g. "20+", "4"
-           */
-          value: string;
-          /**
-           * e.g. "Years of fieldwork"
-           */
-          label: string;
-          id?: string | null;
-        }[];
-        id?: string | null;
-        blockName?: string | null;
-        blockType: 'figures';
-      }
-  )[];
+            }[];
+            portraitImage: number | Media;
+            portraitCaption?: string | null;
+            actions?:
+              | {
+                  label: string;
+                  href: string;
+                  variant?: ('primary' | 'ghost') | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'hero';
+          }
+        | {
+            /**
+             * Publication names that scroll across the strip.
+             */
+            publications: {
+              name: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pressMarquee';
+          }
+        | {
+            /**
+             * Pick the book to spotlight.
+             */
+            book: number | Book;
+            eyebrow?: string | null;
+            primaryActionLabel?: string | null;
+            secondaryActionLabel?: string | null;
+            secondaryActionHref?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'featuredBook';
+          }
+        | {
+            variant: 'featured' | 'listing';
+            heading: string;
+            /**
+             * Cards per page for listing variant.
+             */
+            pageSize?: number | null;
+            /**
+             * Pick the articles to feature (recommended: 3).
+             */
+            articles?: (number | Article)[] | null;
+            viewAllLabel?: string | null;
+            viewAllHref?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'latestArticles';
+          }
+        | {
+            items: {
+              /**
+               * e.g. "20+", "4"
+               */
+              value: string;
+              /**
+               * e.g. "Years of fieldwork"
+               */
+              label: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'figures';
+          }
+        | {
+            heading: string;
+            description?: string | null;
+            /**
+             * 0 = show all books. Otherwise limit to latest N books.
+             */
+            maxItems?: number | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'booksGrid';
+          }
+      )[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -677,6 +708,10 @@ export interface MediaSelect<T extends boolean = true> {
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  showInNavigation?: T;
+  navigationLabel?: T;
+  navigationGroup?: T;
+  navigationOrder?: T;
   meta?:
     | T
     | {
@@ -739,7 +774,9 @@ export interface PagesSelect<T extends boolean = true> {
         latestArticles?:
           | T
           | {
+              variant?: T;
               heading?: T;
+              pageSize?: T;
               articles?: T;
               viewAllLabel?: T;
               viewAllHref?: T;
@@ -756,6 +793,15 @@ export interface PagesSelect<T extends boolean = true> {
                     label?: T;
                     id?: T;
                   };
+              id?: T;
+              blockName?: T;
+            };
+        booksGrid?:
+          | T
+          | {
+              heading?: T;
+              description?: T;
+              maxItems?: T;
               id?: T;
               blockName?: T;
             };
