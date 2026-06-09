@@ -1,25 +1,7 @@
 ---
-const links = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/books", label: "Books" },
-    {
-        label: "My Works",
-        children: [
-            { href: "/articles", label: "Articles" },
-            { href: "/conferences", label: "Conferences" },
-            { href: "/consulting", label: "Consulting" },
-        ],
-    },
-    {
-        label: "Media",
-        children: [
-            { href: "/media", label: "Press & News" },
-            { href: "/podcasts", label: "Podcasts" },
-        ],
-    },
-    { href: "/contact", label: "Contact" },
-];
+import { fetchNavigation } from "../lib/payload/navigation";
+
+const links = await fetchNavigation();
 ---
 
 <header class="header">
@@ -82,7 +64,7 @@ const links = [
                                     </ul>
                                 </>
                             ) : (
-                                <a href={link.href} class="nav-link">
+                                <a href={link.href ?? "#"} class="nav-link">
                                     {link.label}
                                 </a>
                             )}
