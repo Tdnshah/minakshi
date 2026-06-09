@@ -55,16 +55,18 @@ export interface FeaturedBookBlockData {
 export interface LatestArticlesBlockData {
   blockType: 'latestArticles';
   id?: string;
-  heading: string;
+  variant?: 'featured' | 'listing';
+  heading?: string;
+  pageSize?: number;
   articles: Array<string | {
     id: string;
     title: string;
     platform: string;
     url: string;
-    date: string;
+    date: string | Date;
     excerpt: string;
     image?: string;
-    tags?: Array<{ tag: string }>;
+    tags?: Array<{ tag: string }> | string[];
   }>;
   viewAllLabel?: string;
   viewAllHref?: string;
