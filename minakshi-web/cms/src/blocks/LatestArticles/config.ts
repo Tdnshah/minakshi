@@ -1,5 +1,9 @@
 import type { Block } from 'payload';
 
+function isListingVariant(siblingData: unknown): boolean {
+  return (siblingData as { variant?: string } | undefined)?.variant === 'listing';
+}
+
 /**
  * LatestArticles block — curated grid of feature articles.
  * Maps to: app/src/components/blocks/LatestArticlesBlock.astro
@@ -25,7 +29,7 @@ export const LatestArticles: Block = {
       defaultValue: 9,
       min: 1,
       admin: {
-        condition: (_, siblingData) => siblingData?.variant === 'listing',
+        condition: (_, siblingData) => isListingVariant(siblingData),
         description: 'Cards per page for listing variant.',
       },
     },
@@ -36,11 +40,11 @@ export const LatestArticles: Block = {
       hasMany: true,
       maxRows: 6,
       admin: {
-        condition: (_, siblingData) => siblingData?.variant !== 'listing',
+        condition: (_, siblingData) => !isListingVariant(siblingData),
         description: 'Pick the articles to feature (recommended: 3).',
       },
       validate: (value, { siblingData }) => {
-        if (siblingData?.variant === 'listing') return true;
+        if (isListingVariant(siblingData)) return true;
         if (Array.isArray(value) && value.length > 0) return true;
         return 'Please select at least one article for featured variant.';
       },
