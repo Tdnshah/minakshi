@@ -76,9 +76,18 @@ export interface FiguresBlockData {
   items: Array<{ id?: string; value: string; label: string }>;
 }
 
+export interface BooksGridBlockData {
+  blockType: 'booksGrid';
+  id?: string;
+  heading: string;
+  description?: string;
+  maxItems?: number;
+}
+
 export type PageBlock =
   | HeroBlockData
   | PressMarqueeBlockData
   | FeaturedBookBlockData
   | LatestArticlesBlockData
-  | FiguresBlockData;
+  | FiguresBlockData
+  | BooksGridBlockData;

@@ -1,0 +1,28 @@
+---
+import PageHeader from "./PageHeader.astro";
+import { fetchPageBySlug } from "../../lib/payload/pages";
+import type { HeroBlockData, PageBlock } from "../blocks/types";
+
+interface Props {
+    slug: string;
+    fallbackEyebrow: string;
+    fallbackTitle: string;
+    fallbackDescription: string;
+    variant?: "default" | "stacked";
+}
+
+const { slug, fallbackEyebrow, fallbackTitle, fallbackDescription, variant = "default" } = Astro.props;
+
+const page = await fetchPageBySlug(slug);
+
+const heroBlock = page?.blocks?.find(
+    (block: PageBlock): block is HeroBlockData => block.blockType === "hero",
+);
+
+const eyebrow = heroBlock?.eyebrow ?? fallbackEyebrow;
+const title = page?.title ?? fallbackTitle;
+const description =
+    page?.meta?.description ?? heroBlock?.description ?? fallbackDescription;
+---
+
+<PageHeader eyebrow={eyebrow} title={title} description={description} variant={variant} />
