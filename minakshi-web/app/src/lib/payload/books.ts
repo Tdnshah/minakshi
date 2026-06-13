@@ -13,6 +13,7 @@ export interface PayloadBuyLink {
   id?: string;
   store: string;
   url: string;
+  price?: string;
 }
 
 export interface PayloadReview {
@@ -48,6 +49,7 @@ export interface PayloadBookEvent {
   city?: string;
   description?: string;
   url?: string;
+  role?: string;
 }
 
 export interface PayloadEventGalleryItem {
@@ -56,6 +58,21 @@ export interface PayloadEventGalleryItem {
   caption?: string;
 }
 
+
+export interface PayloadBookTheme {
+  id?: string;
+  number: string;
+  title: string;
+  accentWord: string;
+  description: string;
+  tag: string;
+}
+
+export interface PayloadBookStat {
+  id?: string;
+  value: string;
+  label: string;
+}
 
 export interface PayloadBook {
   id: string;
@@ -74,6 +91,15 @@ export interface PayloadBook {
   mediaCoverage?: PayloadMediaCoverage[];
   bookEvents?: PayloadBookEvent[];
   eventGallery?: PayloadEventGalleryItem[];
+  /** Extended editorial fields — added to CMS in a future migration */
+  themes?: PayloadBookTheme[];
+  excerptEyebrow?: string;
+  excerptTitle?: string;
+  excerptText?: string;
+  excerptCite?: string;
+  behindStats?: PayloadBookStat[];
+  pullQuote?: string;
+  pullQuoteCite?: string;
   updatedAt: string;
   createdAt: string;
 }

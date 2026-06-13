@@ -4,12 +4,16 @@ export const prerender = false;
 import BookLayout from "../../layouts/BookLayout.astro";
 import BookHero from "../../components/BookHero.astro";
 import BuyButton from "../../components/BuyButton.astro";
-import ReviewSlider from "../../components/ReviewSlider.astro";
-import EventGallery from "../../components/EventGallery.astro";
-import RequestCopyForm from "../../components/RequestCopyForm.astro";
-import BookMediaHighlights from "../../components/BookMediaHighlights.astro";
+import BookThemes from "../../components/BookThemes.astro";
+import BookExcerpt from "../../components/BookExcerpt.astro";
+import BookBehind from "../../components/BookBehind.astro";
+import BookPullQuote from "../../components/BookPullQuote.astro";
+import BookBuy from "../../components/BookBuy.astro";
+import BookPressGrid from "../../components/system/BookPressGrid.astro";
+import type { PressItem } from "../../components/system/BookPressGrid.astro";
 import BookAwards from "../../components/BookAwards.astro";
 import BookEvents from "../../components/BookEvents.astro";
+import EventGallery from "../../components/EventGallery.astro";
 import { fetchBookBySlug } from "../../lib/payload/books";
 import { lexicalToHtml } from "../../lib/lexical";
 
@@ -19,32 +23,48 @@ const currentPath = Astro.url.pathname;
 if (!slug) return Astro.redirect("/books");
 
 const book = await fetchBookBySlug(slug);
-console.log(book);
-
 
 if (!book) {
-  return new Response(
-    `<!doctype html><html><head><title>Book not found</title></head><body style="font-family:sans-serif;text-align:center;padding:4rem">
-      <h1>Book not found</h1>
-      <p>The CMS may still be starting up — please try again in a moment.</p>
-      <p><a href="/books">← Back to Books</a></p>
-    </body></html>`,
-    { status: 404, headers: { 'Content-Type': 'text/html' } }
-  );
+    return new Response(
+        `<!doctype html><html><head><title>Book not found</title></head><body style="font-family:sans-serif;text-align:center;padding:4rem">
+            <h1>Book not found</h1>
+            <p>The CMS may still be starting up — please try again in a moment.</p>
+            <p><a href="/books">← Back to Books</a></p>
+        </body></html>`,
+        { status: 404, headers: { 'Content-Type': 'text/html' } }
+    );
 }
 
 const descriptionHtml = book.description ? lexicalToHtml(book.description) : "";
 const coverUrl = book.coverImage?.url ?? "";
 
-// Normalise gallery to { url, alt, caption }[]
 const galleryImages = (book.eventGallery ?? [])
     .filter((g) => g.image?.url)
     .map((g) => ({ url: g.image!.url, alt: g.image!.alt ?? "", caption: g.caption ?? "" }));
+
+// Merge reviews + media coverage into a single PressItem list for BookPressGrid.
+// Reviews come first (blockquote variant), then media articles.
+const pressItems: PressItem[] = [
+    ...(book.reviews ?? []).map((r) => ({
+        id: r.id,
+        quote: r.quote,
+        publication: r.author,
+        url: r.source,
+    })),
+    ...(book.mediaCoverage ?? []).map((m) => ({
+        id: m.id,
+        title: m.title,
+        publication: m.reviewer,
+        url: m.url,
+        type: m.type,
+        date: m.date,
+    })),
+];
 ---
 
 <BookLayout title={book.title} description={typeof book.description === 'string' ? book.description : book.title}>
 
-    <!-- ① Hero: cover + metadata + buy links + bookKits -->
+    <!-- ① Hero: cover + metadata + buy links -->
     <BookHero
         title={book.title}
         subtitle={book.subtitle}
@@ -63,134 +83,188 @@ const galleryImages = (book.eventGallery ?? [])
         </Fragment>
     </BookHero>
 
-    <!-- ② About the Book (rich text body) -->
+    <!-- ② Synopsis / About the Book -->
     {descriptionHtml && (
-        <section class="about-section">
+        <section class="synopsis">
             <div class="container">
-                <div class="about-wrapper">
-                    <h2 class="about-heading">About the Book</h2>
-                    <div class="about-body" set:html={descriptionHtml} />
+                <div class="synopsis-eyebrow-wrap">
+                    <p class="eyebrow">About the book</p>
                 </div>
+                <div class="prose" set:html={descriptionHtml} />
             </div>
         </section>
     )}
 
-    <!-- ③ Awards & Recognition -->
+    <!-- ③ Themes (optional — requires CMS fields) -->
+    {(book.themes?.length ?? 0) > 0 && (
+        <BookThemes themes={book.themes!} />
+    )}
+
+    <!-- ④ Featured Excerpt (optional — requires CMS fields) -->
+    {book.excerptText && (
+        <BookExcerpt
+            eyebrow={book.excerptEyebrow ?? "An excerpt"}
+            title={book.excerptTitle ?? ""}
+            paragraphs={[book.excerptText]}
+            cite={book.excerptCite ?? ""}
+        />
+    )}
+
+    <!-- ⑤ Press & Reviews (reviews + media coverage merged) -->
+    {pressItems.length > 0 && (
+        <BookPressGrid items={pressItems} />
+    )}
+
+    <!-- ⑥ Awards & Recognition -->
     {(book.awards?.length ?? 0) > 0 && (
         <BookAwards awards={book.awards!} />
     )}
 
-    <!-- ④ Reviews / Praise -->
-    {(book.reviews?.length ?? 0) > 0 && (
-        <ReviewSlider reviews={book.reviews!} />
+    <!-- ⑦ Behind the Book (optional — requires CMS fields) -->
+    {(book.behindStats?.length ?? 0) > 0 && (
+        <BookBehind stats={book.behindStats!} />
     )}
 
-    <!-- ⑤ Media Highlights -->
-    {(book.mediaCoverage?.length ?? 0) > 0 && (
-        <BookMediaHighlights mediaCoverage={book.mediaCoverage!} />
-    )}
-
-    <!-- ⑥ Book Events -->
+    <!-- ⑧ Events / Book Tour -->
     {(book.bookEvents?.length ?? 0) > 0 && (
         <BookEvents events={book.bookEvents!} />
     )}
 
-    <!-- ⑦ Event Gallery -->
+    <!-- ⑨ Event Gallery -->
     {galleryImages.length > 0 && (
         <EventGallery images={galleryImages} />
     )}
 
-    <!-- ⑧ Discuss the Book -->
+    <!-- ⑩ Pull Quote (optional — requires CMS fields) -->
+    {book.pullQuote && (
+        <BookPullQuote
+            quote={book.pullQuote}
+            cite={book.pullQuoteCite}
+        />
+    )}
+
+    <!-- ⑪ Where to Buy -->
+    {(book.buyLinks?.length ?? 0) > 0 && (
+        <BookBuy buyLinks={book.buyLinks!} />
+    )}
+
+    <!-- ⑫ Discussion -->
     <section class="discuss-section">
         <div class="container">
-            <div class="discuss-wrapper">
-                <h2 class="discuss-heading">Discuss this Book</h2>
-                <p class="discuss-sub">Have thoughts? Leave a comment below.</p>
-                <div
-                    id="cusdis_thread"
-                    data-host="https://cusdis.com"
-                    data-app-id="0eb2bb71-8b26-41c8-ba8a-8ce6995af072"
-                    data-page-id={slug}
-                    data-page-url={currentPath}
-                    data-page-title={book.title}
-                />
-            </div>
+            <h2 class="discuss-heading">Discuss this book</h2>
+            <p class="discuss-sub">Have thoughts? Leave a comment below.</p>
+            <div
+                id="cusdis_thread"
+                data-host="https://cusdis.com"
+                data-app-id="0eb2bb71-8b26-41c8-ba8a-8ce6995af072"
+                data-page-id={slug}
+                data-page-url={currentPath}
+                data-page-title={book.title}
+            />
         </div>
     </section>
 
 </BookLayout>
 
 <style>
-    /* About the Book */
-    .about-section {
-        padding: var(--spacing-xl) 0;
-        background: white;
+    /* ── Synopsis ── */
+    .synopsis {
+        padding: 5rem 0;
+        background: var(--paper);
+        border-bottom: 1px solid var(--ink);
     }
 
-    .about-wrapper {
-        max-width: 740px;
+    /* Eyebrow is centered over the prose column */
+    .synopsis-eyebrow-wrap {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--accent);
+        margin: 0;
+    }
+
+    .eyebrow::before {
+        content: '';
+        display: inline-block;
+        width: 1.5rem;
+        height: 1px;
+        background: var(--accent);
+    }
+
+    /* Prose block: centered in container, text stays left-aligned */
+    .prose {
+        max-width: 68ch;
         margin: 0 auto;
     }
 
-    .about-heading {
-        font-size: 1.75rem;
-        margin-bottom: var(--spacing-lg);
-        padding-bottom: var(--spacing-sm);
-        border-bottom: 2px solid var(--color-border);
+    .prose :global(p) {
+        font-family: var(--font-body);
+        font-size: 1.0625rem;
+        line-height: 1.75;
+        color: var(--ink-mid);
+        margin: 0 0 1.25rem 0;
     }
 
-    .about-body {
-        font-size: 1.05rem;
-        line-height: 1.85;
-        color: var(--color-text-light);
-    }
+    .prose :global(p:last-child) { margin-bottom: 0; }
 
-    .about-body :global(p)          { margin-bottom: var(--spacing-md); }
-    .about-body :global(h2)         { font-size: 1.4rem; margin-top: var(--spacing-xl); margin-bottom: var(--spacing-sm); }
-    .about-body :global(h3)         { font-size: 1.2rem; margin-top: var(--spacing-lg); margin-bottom: var(--spacing-sm); }
-    .about-body :global(ul),
-    .about-body :global(ol)         { padding-left: var(--spacing-lg); margin-bottom: var(--spacing-md); }
-    .about-body :global(li)         { margin-bottom: var(--spacing-xs); }
-    .about-body :global(blockquote) {
-        border-left: 4px solid var(--color-primary);
-        padding-left: var(--spacing-md);
-        margin: var(--spacing-md) 0;
+    .prose :global(em) {
         font-style: italic;
-        color: #555;
+        color: var(--ink);
     }
-    .about-body :global(a) {
-        color: var(--color-primary);
+
+    .prose :global(strong) {
+        font-weight: 600;
+        color: var(--ink);
+    }
+
+    .prose :global(a) {
+        color: var(--accent);
         text-decoration: underline;
-        text-underline-offset: 3px;
+        text-underline-offset: 2px;
+        transition: color 0.15s var(--ease-editorial);
     }
-    .about-body :global(code) {
-        background: rgba(0,0,0,0.06);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 0.9em;
-    }
-    .about-body :global(strong) { font-weight: 700; }
-    .about-body :global(em)     { font-style: italic; }
 
-    /* Discuss */
+    .prose :global(a:hover) {
+        color: var(--accent-deep);
+    }
+
+    /* ── Discussion ── */
     .discuss-section {
-        padding: var(--spacing-xl) 0;
-        background: #fff;
-        border-top: 1px solid var(--color-border);
-    }
-
-    .discuss-wrapper {
-        max-width: 740px;
-        margin: 0 auto;
+        padding: 5rem 0;
+        background: var(--paper);
+        border-top: 1px solid var(--ink);
     }
 
     .discuss-heading {
-        font-size: 1.75rem;
-        margin-bottom: var(--spacing-sm);
+        font-family: var(--font-display);
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-weight: 500;
+        color: var(--ink);
+        margin-bottom: 0.5rem;
+        font-variation-settings: "opsz" 36, "SOFT" 30;
     }
 
     .discuss-sub {
-        color: #777;
-        margin-bottom: var(--spacing-lg);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        color: var(--ink-mid);
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .synopsis,
+        .discuss-section {
+            padding: 3.5rem 0;
+        }
     }
 </style>

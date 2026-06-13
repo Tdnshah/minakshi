@@ -1,0 +1,86 @@
+---
+import SectionHeader from './system/SectionHeader.astro';
+
+interface BuyLink {
+    id?: string;
+    store: string;
+    url: string;
+    price?: string;
+}
+
+interface Props {
+    buyLinks: BuyLink[];
+}
+
+const { buyLinks } = Astro.props;
+---
+
+<section class="buy-section" id="buy">
+    <div class="container">
+        <SectionHeader eyebrow="Get the book" title="Where to" italicPart="buy." />
+        <div class="buy-grid">
+            {buyLinks.map((link) => (
+                <a href={link.url} target="_blank" rel="noopener noreferrer" class="buy-card">
+                    <span class="retailer">{link.store}</span>
+                    {link.price && <span class="price">{link.price}</span>}
+                </a>
+            ))}
+        </div>
+    </div>
+</section>
+
+<style>
+    .buy-section {
+        padding: 5rem 0;
+        background: var(--paper);
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .buy-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1px;
+        background: var(--ink);
+        border: 1px solid var(--ink);
+    }
+
+    .buy-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1.5rem;
+        background: var(--paper);
+        text-decoration: none;
+        transition: background 0.2s var(--ease-editorial);
+    }
+
+    .buy-card:hover {
+        background: var(--paper-deep);
+    }
+
+    .retailer {
+        font-family: var(--font-body);
+        font-size: 1rem;
+        font-weight: 500;
+        color: var(--ink);
+        transition: color 0.15s var(--ease-editorial);
+    }
+
+    .buy-card:hover .retailer {
+        color: var(--accent);
+    }
+
+    .price {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-soft);
+    }
+
+    @media (max-width: 480px) {
+        .buy-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
