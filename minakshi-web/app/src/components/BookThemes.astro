@@ -1,0 +1,135 @@
+---
+import SectionHeader from './system/SectionHeader.astro';
+
+interface Theme {
+    id?: string;
+    number: string;
+    title: string;
+    accentWord: string;
+    description: string;
+    tag: string;
+}
+
+interface Props {
+    themes: Theme[];
+    eyebrow?: string;
+    heading?: string;
+    headingItalic?: string;
+}
+
+const {
+    themes,
+    eyebrow = 'What the book covers',
+    heading = 'Six threads, one',
+    headingItalic = 'shroud.',
+} = Astro.props;
+---
+
+<section class="themes-section">
+    <div class="container">
+        <SectionHeader eyebrow={eyebrow} title={heading} italicPart={headingItalic} />
+        <div class="themes-grid">
+            {themes.map((theme) => {
+                const parts = theme.title.split(theme.accentWord);
+                return (
+                    <article class="theme-card">
+                        <span class="num">{theme.number}</span>
+                        <h3>
+                            {parts[0]}<em>{theme.accentWord}</em>{parts[1] ?? ''}
+                        </h3>
+                        <p>{theme.description}</p>
+                        <span class="tag">{theme.tag}</span>
+                    </article>
+                );
+            })}
+        </div>
+    </div>
+</section>
+
+<style>
+    .themes-section {
+        padding: 5rem 0;
+        background: var(--paper);
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .themes-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--ink);
+        border: 1px solid var(--ink);
+    }
+
+    .theme-card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.75rem;
+        background: var(--paper);
+        transition: background 0.24s var(--ease-editorial);
+    }
+
+    .theme-card:hover {
+        background: var(--paper-soft);
+    }
+
+    .num {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: var(--ink);
+        line-height: 1;
+        font-variation-settings: "opsz" 36, "SOFT" 30;
+    }
+
+    h3 {
+        font-family: var(--font-display);
+        font-size: 1.375rem;
+        font-weight: 500;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        margin: 0;
+        font-variation-settings: "opsz" 36, "SOFT" 30, "WONK" 0;
+    }
+
+    h3 em {
+        font-style: italic;
+        color: var(--accent);
+        font-variation-settings: "opsz" 36, "SOFT" 80, "WONK" 1;
+    }
+
+    p {
+        font-family: var(--font-body);
+        font-size: 0.9375rem;
+        line-height: 1.65;
+        color: var(--ink-mid);
+        margin: 0;
+        flex: 1;
+    }
+
+    .tag {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-soft);
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--rule-soft);
+        margin-top: auto;
+    }
+
+    @media (max-width: 900px) {
+        .themes-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 560px) {
+        .themes-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

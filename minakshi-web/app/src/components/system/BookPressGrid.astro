@@ -1,0 +1,247 @@
+---
+/**
+ * BookPressGrid — reusable press grid for book pages.
+ *
+ * Accepts a normalised PressItem array so the caller can mix
+ * review quotes (with `quote`) and media articles (with `title`)
+ * in the same 1px-gap ink grid.
+ */
+import SectionHeader from './SectionHeader.astro';
+
+export interface PressItem {
+    id?: string;
+    /** Large italic blockquote — renders the review variant */
+    quote?: string;
+    /** Article headline — renders the media variant */
+    title?: string;
+    /** Publication name, e.g. "The Hindu" */
+    publication: string;
+    /** Reviewer / author name */
+    reviewer?: string;
+    /** ISO date string */
+    date?: string;
+    /** Link to the original article / review */
+    url?: string;
+    /** Content type tag: "Review", "Interview", "Article", etc. */
+    type?: string;
+}
+
+interface Props {
+    items: PressItem[];
+    eyebrow?: string;
+    heading?: string;
+    headingItalic?: string;
+}
+
+const {
+    items,
+    eyebrow = 'Press & reviews',
+    heading = 'What others have',
+    headingItalic = 'said.',
+} = Astro.props;
+
+function fmtDate(d?: string) {
+    if (!d) return '';
+    try {
+        return new Date(d).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+    } catch {
+        return d;
+    }
+}
+---
+
+<section class="press-section">
+    <div class="container">
+        <SectionHeader eyebrow={eyebrow} title={heading} italicPart={headingItalic} />
+        <div class="press-grid">
+            {items.map((item) =>
+                item.quote ? (
+                    /* Review variant — prominent blockquote */
+                    <article class="press-card press-card--review">
+                        <blockquote>{item.quote}</blockquote>
+                        <cite>
+                            <strong>{item.publication}</strong>
+                            {item.reviewer && <span class="meta">{item.reviewer}</span>}
+                            {item.date && <span class="meta">{fmtDate(item.date)}</span>}
+                        </cite>
+                    </article>
+                ) : (
+                    /* Media article variant — linked card */
+                    <article class="press-card press-card--article">
+                        <div class="card-top">
+                            {item.type && <span class="type-tag">{item.type}</span>}
+                            {item.date && <span class="card-date">{fmtDate(item.date)}</span>}
+                        </div>
+                        <p class="card-pub">{item.publication}</p>
+                        {item.url ? (
+                            <a href={item.url} target="_blank" rel="noopener noreferrer" class="card-title">
+                                {item.title}
+                            </a>
+                        ) : (
+                            <p class="card-title card-title--plain">{item.title}</p>
+                        )}
+                        {item.url && (
+                            <a href={item.url} target="_blank" rel="noopener noreferrer" class="card-link">
+                                Read →
+                            </a>
+                        )}
+                    </article>
+                )
+            )}
+        </div>
+    </div>
+</section>
+
+<style>
+    .press-section {
+        padding: 5rem 0;
+        background: var(--paper-soft);
+        border-bottom: 1px solid var(--ink);
+    }
+
+    /* Hairline grid using border-on-items so empty last-row slots stay clear */
+    .press-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        border-top: 1px solid var(--ink);
+        border-left: 1px solid var(--ink);
+    }
+
+    /* Base card */
+    .press-card {
+        background: var(--paper);
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        border-right: 1px solid var(--ink);
+        border-bottom: 1px solid var(--ink);
+        transition: background 0.2s var(--ease-editorial);
+    }
+
+    .press-card:hover {
+        background: var(--paper-soft);
+    }
+
+    /* ── Review variant ── */
+    blockquote {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 1.0625rem;
+        line-height: 1.65;
+        color: var(--ink-mid);
+        font-variation-settings: "opsz" 24, "SOFT" 60, "WONK" 0;
+        flex: 1;
+        margin: 0;
+        padding: 0;
+        border: none;
+    }
+
+    cite {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 0.375rem 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--rule-soft);
+        font-style: normal;
+    }
+
+    cite strong {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--ink);
+    }
+
+    .meta {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--ink-soft);
+    }
+
+    /* ── Article variant ── */
+    .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .type-tag {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--accent);
+        font-weight: 500;
+    }
+
+    .card-date {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--ink-soft);
+    }
+
+    .card-pub {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--ink);
+        margin: 0;
+    }
+
+    .card-title {
+        font-family: var(--font-display);
+        font-size: 1.0625rem;
+        font-weight: 500;
+        line-height: 1.35;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        font-variation-settings: "opsz" 24, "SOFT" 30, "WONK" 0;
+        flex: 1;
+        text-decoration: none;
+        transition: color 0.15s var(--ease-editorial);
+    }
+
+    a.card-title:hover {
+        color: var(--accent);
+    }
+
+    .card-title--plain {
+        margin: 0;
+    }
+
+    .card-link {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--accent);
+        text-decoration: none;
+        margin-top: auto;
+        transition: color 0.15s var(--ease-editorial);
+    }
+
+    .card-link:hover {
+        color: var(--accent-deep);
+    }
+
+    @media (max-width: 640px) {
+        .press-section {
+            padding: 3.5rem 0;
+        }
+
+        .press-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

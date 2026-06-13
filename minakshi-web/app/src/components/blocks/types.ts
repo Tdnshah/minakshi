@@ -93,3 +93,137 @@ export type PageBlock =
   | LatestArticlesBlockData
   | FiguresBlockData
   | BooksGridBlockData;
+
+// ── Book-detail blocks ────────────────────────────────────────────────────────
+
+export interface BookThemesBlockData {
+  blockType: 'book-themes';
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  headingItalic?: string;
+  items: Array<{
+    id?: string;
+    number: string;
+    title: string;
+    accentWord: string;
+    description: string;
+    tag: string;
+  }>;
+}
+
+export interface BookExcerptBlockData {
+  blockType: 'book-excerpt';
+  id?: string;
+  eyebrow?: string;
+  title: string;
+  paragraphs: Array<{ id?: string; text: string }>;
+  cite?: string;
+}
+
+export interface BookBehindStatsBlockData {
+  blockType: 'book-behind-stats';
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  headingItalic?: string;
+  stats: Array<{ id?: string; value: string; label: string }>;
+}
+
+export interface BookPullQuoteBlockData {
+  blockType: 'book-pull-quote';
+  id?: string;
+  quote: string;
+  cite?: string;
+}
+
+export interface BookAwardsBlockData {
+  blockType: 'book-awards';
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  headingItalic?: string;
+  items: Array<{
+    id?: string;
+    title: string;
+    organization: string;
+    year?: number;
+    status?: 'winner' | 'shortlisted' | 'longlisted' | 'nominated';
+    url?: string;
+  }>;
+}
+
+export interface BookEventsBlockData {
+  blockType: 'book-events';
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  headingItalic?: string;
+  allEventsHref?: string;
+  events: Array<{
+    id?: string;
+    name: string;
+    date: string;
+    venue?: string;
+    city?: string;
+    description?: string;
+    url?: string;
+    role?: string;
+  }>;
+}
+
+export interface BookReviewsBlockData {
+  blockType: 'book-reviews';
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  headingItalic?: string;
+  reviews: Array<{
+    id?: string;
+    quote: string;
+    author: string;
+    reviewer?: string;
+    source?: string;
+  }>;
+}
+
+export interface BookMediaBlockData {
+  blockType: 'book-media';
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  headingItalic?: string;
+  items: Array<{
+    id?: string;
+    title: string;
+    reviewer: string;
+    url: string;
+    type?: string;
+    date: string;
+  }>;
+}
+
+export interface BookBuyBlockData {
+  blockType: 'book-buy';
+  id?: string;
+  eyebrow?: string;
+  heading?: string;
+  headingItalic?: string;
+  links: Array<{
+    id?: string;
+    store: string;
+    url: string;
+    price?: string;
+  }>;
+}
+
+export type BookBlock =
+  | BookThemesBlockData
+  | BookExcerptBlockData
+  | BookBehindStatsBlockData
+  | BookPullQuoteBlockData
+  | BookAwardsBlockData
+  | BookEventsBlockData
+  | BookReviewsBlockData
+  | BookMediaBlockData
+  | BookBuyBlockData;

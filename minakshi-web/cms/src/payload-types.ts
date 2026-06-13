@@ -412,6 +412,192 @@ export interface Book {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Optional extra content sections. Use these to add themes, excerpts, pull quotes, extra press grids, events, or buy links beyond the structured fields above.
+   */
+  blocks?:
+    | (
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            headingItalic?: string | null;
+            items: {
+              /**
+               * Roman numeral, e.g. "I." or "II."
+               */
+              number: string;
+              title: string;
+              /**
+               * Word in title rendered in italic accent.
+               */
+              accentWord: string;
+              description: string;
+              /**
+               * e.g. "Chapters 1–4"
+               */
+              tag: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-themes';
+          }
+        | {
+            eyebrow?: string | null;
+            /**
+             * Displayed as a large italic heading.
+             */
+            title: string;
+            paragraphs: {
+              text: string;
+              id?: string | null;
+            }[];
+            /**
+             * Attribution line (chapter title, page reference, etc.).
+             */
+            cite?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-excerpt';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            headingItalic?: string | null;
+            stats: {
+              /**
+               * e.g. "4" or "<em>4</em>" for italic.
+               */
+              value: string;
+              /**
+               * e.g. "Years of research"
+               */
+              label: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-behind-stats';
+          }
+        | {
+            quote: string;
+            /**
+             * Optional attribution, e.g. "— Author's note".
+             */
+            cite?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-pull-quote';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            headingItalic?: string | null;
+            items: {
+              title: string;
+              organization: string;
+              year?: number | null;
+              status?: ('winner' | 'shortlisted' | 'longlisted' | 'nominated') | null;
+              url?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-awards';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            headingItalic?: string | null;
+            /**
+             * Link for "All events →" action.
+             */
+            allEventsHref?: string | null;
+            events: {
+              name: string;
+              date: string;
+              venue?: string | null;
+              city?: string | null;
+              description?: string | null;
+              url?: string | null;
+              /**
+               * e.g. "Author talk", "Keynote"
+               */
+              role?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-events';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            headingItalic?: string | null;
+            reviews: {
+              quote: string;
+              /**
+               * Publication name.
+               */
+              author: string;
+              /**
+               * Reviewer name (optional).
+               */
+              reviewer?: string | null;
+              /**
+               * URL to original review.
+               */
+              source?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-reviews';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            headingItalic?: string | null;
+            items: {
+              title: string;
+              /**
+               * Publication name.
+               */
+              reviewer: string;
+              url: string;
+              /**
+               * e.g. "Review", "Interview", "Feature"
+               */
+              type?: string | null;
+              date: string;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-media';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            headingItalic?: string | null;
+            links: {
+              /**
+               * e.g. "Amazon", "Flipkart"
+               */
+              store: string;
+              url: string;
+              /**
+               * Optional price label, e.g. "₹499"
+               */
+              price?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'book-buy';
+          }
+      )[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -908,6 +1094,163 @@ export interface BooksSelect<T extends boolean = true> {
         image?: T;
         caption?: T;
         id?: T;
+      };
+  blocks?:
+    | T
+    | {
+        'book-themes'?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingItalic?: T;
+              items?:
+                | T
+                | {
+                    number?: T;
+                    title?: T;
+                    accentWord?: T;
+                    description?: T;
+                    tag?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        'book-excerpt'?:
+          | T
+          | {
+              eyebrow?: T;
+              title?: T;
+              paragraphs?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              cite?: T;
+              id?: T;
+              blockName?: T;
+            };
+        'book-behind-stats'?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingItalic?: T;
+              stats?:
+                | T
+                | {
+                    value?: T;
+                    label?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        'book-pull-quote'?:
+          | T
+          | {
+              quote?: T;
+              cite?: T;
+              id?: T;
+              blockName?: T;
+            };
+        'book-awards'?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingItalic?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    organization?: T;
+                    year?: T;
+                    status?: T;
+                    url?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        'book-events'?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingItalic?: T;
+              allEventsHref?: T;
+              events?:
+                | T
+                | {
+                    name?: T;
+                    date?: T;
+                    venue?: T;
+                    city?: T;
+                    description?: T;
+                    url?: T;
+                    role?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        'book-reviews'?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingItalic?: T;
+              reviews?:
+                | T
+                | {
+                    quote?: T;
+                    author?: T;
+                    reviewer?: T;
+                    source?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        'book-media'?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingItalic?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    reviewer?: T;
+                    url?: T;
+                    type?: T;
+                    date?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        'book-buy'?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              headingItalic?: T;
+              links?:
+                | T
+                | {
+                    store?: T;
+                    url?: T;
+                    price?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
       };
   updatedAt?: T;
   createdAt?: T;
