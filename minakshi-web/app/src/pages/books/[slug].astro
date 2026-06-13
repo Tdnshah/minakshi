@@ -10,7 +10,6 @@ import BookBehind from "../../components/BookBehind.astro";
 import BookPullQuote from "../../components/BookPullQuote.astro";
 import BookBuy from "../../components/BookBuy.astro";
 import BookPressGrid from "../../components/system/BookPressGrid.astro";
-import type { PressItem } from "../../components/system/BookPressGrid.astro";
 import BookAwards from "../../components/BookAwards.astro";
 import BookEvents from "../../components/BookEvents.astro";
 import EventGallery from "../../components/EventGallery.astro";
@@ -42,24 +41,21 @@ const galleryImages = (book.eventGallery ?? [])
     .filter((g) => g.image?.url)
     .map((g) => ({ url: g.image!.url, alt: g.image!.alt ?? "", caption: g.caption ?? "" }));
 
-// Merge reviews + media coverage into a single PressItem list for BookPressGrid.
-// Reviews come first (blockquote variant), then media articles.
-const pressItems: PressItem[] = [
-    ...(book.reviews ?? []).map((r) => ({
-        id: r.id,
-        quote: r.quote,
-        publication: r.author,
-        url: r.source,
-    })),
-    ...(book.mediaCoverage ?? []).map((m) => ({
-        id: m.id,
-        title: m.title,
-        publication: m.reviewer,
-        url: m.url,
-        type: m.type,
-        date: m.date,
-    })),
-];
+const reviewItems = (book.reviews ?? []).map((r) => ({
+    id: r.id,
+    quote: r.quote,
+    publication: r.author,
+    url: r.source,
+}));
+
+const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
+    id: m.id,
+    title: m.title,
+    publication: m.reviewer,
+    url: m.url,
+    type: m.type,
+    date: m.date,
+}));
 ---
 
 <BookLayout title={book.title} description={typeof book.description === 'string' ? book.description : book.title}>
@@ -110,9 +106,24 @@ const pressItems: PressItem[] = [
         />
     )}
 
-    <!-- ⑤ Press & Reviews (reviews + media coverage merged) -->
-    {pressItems.length > 0 && (
-        <BookPressGrid items={pressItems} />
+    <!-- ⑤a Press & Reviews — reader quotes -->
+    {reviewItems.length > 0 && (
+        <BookPressGrid
+            items={reviewItems}
+            eyebrow="Press & reviews"
+            heading="What others have"
+            headingItalic="said."
+        />
+    )}
+
+    <!-- ⑤b Media Coverage — articles, interviews, features -->
+    {mediaItems.length > 0 && (
+        <BookPressGrid
+            items={mediaItems}
+            eyebrow="As seen in"
+            heading="Coverage &"
+            headingItalic="interviews."
+        />
     )}
 
     <!-- ⑥ Awards & Recognition -->
