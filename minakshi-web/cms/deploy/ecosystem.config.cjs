@@ -19,6 +19,9 @@ module.exports = {
       // Next.js standalone server.js respects PORT.
       args: [],
       // env is read from the symlinked .env in cwd; nothing to override here.
+      env: {
+        NODE_ENV: 'production',
+      },
       instances: 1,
       exec_mode: 'fork',
       // Restart policy: backoff so we don't loop on a broken DB connection.
