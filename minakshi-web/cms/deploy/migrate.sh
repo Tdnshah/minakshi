@@ -26,6 +26,10 @@ fi
 
 cd "$(pwd)"
 
+# Payload checks NODE_ENV to decide whether to use migrations or dev-mode
+# auto-push. Ensure it is always 'production' when running on the server.
+export NODE_ENV=production
+
 log "Node:    $(node -v)"
 log "Payload: $(npx --no-install payload --version 2>/dev/null || echo 'unknown')"
 
