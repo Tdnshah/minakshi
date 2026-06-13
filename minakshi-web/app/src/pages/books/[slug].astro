@@ -8,8 +8,9 @@ import BookThemes from "../../components/BookThemes.astro";
 import BookExcerpt from "../../components/BookExcerpt.astro";
 import BookBehind from "../../components/BookBehind.astro";
 import BookPullQuote from "../../components/BookPullQuote.astro";
-import BookBuy from "../../components/BookBuy.astro";
 import BookPressGrid from "../../components/system/BookPressGrid.astro";
+import BlockRenderer from "../../components/blocks/BlockRenderer.astro";
+import type { BookBlock } from "../../components/blocks/types";
 import BookAwards from "../../components/BookAwards.astro";
 import BookEvents from "../../components/BookEvents.astro";
 import EventGallery from "../../components/EventGallery.astro";
@@ -84,7 +85,8 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
         <section class="synopsis">
             <div class="container">
                 <div class="synopsis-eyebrow-wrap">
-                    <p class="eyebrow">About the book</p>
+                    {/* <p class="eyebrow">About the book</p> */}
+                    <h2>About the book</h2>
                 </div>
                 <div class="prose" set:html={descriptionHtml} />
             </div>
@@ -110,9 +112,9 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
     {reviewItems.length > 0 && (
         <BookPressGrid
             items={reviewItems}
-            eyebrow="Press & reviews"
-            heading="What others have"
-            headingItalic="said."
+            eyebrow="What others have"
+            heading="Reviews"
+            headingItalic=""
         />
     )}
 
@@ -121,8 +123,8 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
         <BookPressGrid
             items={mediaItems}
             eyebrow="As seen in"
-            heading="Coverage &"
-            headingItalic="interviews."
+            heading="Media coverage"
+            headingItalic=""
         />
     )}
 
@@ -154,9 +156,9 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
         />
     )}
 
-    <!-- ⑪ Where to Buy -->
-    {(book.buyLinks?.length ?? 0) > 0 && (
-        <BookBuy buyLinks={book.buyLinks!} />
+    <!-- ⑪ Extra blocks from the book block builder -->
+    {(book.blocks?.length ?? 0) > 0 && (
+        <BlockRenderer blocks={book.blocks as BookBlock[]} />
     )}
 
     <!-- ⑫ Discussion -->

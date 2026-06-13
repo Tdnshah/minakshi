@@ -1,0 +1,13 @@
+---
+import BookBuy from '../BookBuy.astro';
+import type { BookBuyBlockData } from './types';
+
+type Props = BookBuyBlockData;
+const { eyebrow, heading, headingItalic, links } = Astro.props;
+---
+<BookBuy
+    buyLinks={links}
+    eyebrow={eyebrow}
+    heading={heading}
+    headingItalic={headingItalic}
+/>

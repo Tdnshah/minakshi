@@ -1,0 +1,13 @@
+---
+import BookBehind from '../BookBehind.astro';
+import type { BookBehindStatsBlockData } from './types';
+
+type Props = BookBehindStatsBlockData;
+const { eyebrow, heading, headingItalic, stats } = Astro.props;
+---
+<BookBehind
+    stats={stats}
+    eyebrow={eyebrow}
+    heading={heading}
+    headingItalic={headingItalic}
+/>

@@ -12,14 +12,22 @@ interface Theme {
 
 interface Props {
     themes: Theme[];
+    eyebrow?: string;
+    heading?: string;
+    headingItalic?: string;
 }
 
-const { themes } = Astro.props;
+const {
+    themes,
+    eyebrow = 'What the book covers',
+    heading = 'Six threads, one',
+    headingItalic = 'shroud.',
+} = Astro.props;
 ---
 
 <section class="themes-section">
     <div class="container">
-        <SectionHeader eyebrow="What the book covers" title="Six threads, one" italicPart="shroud." />
+        <SectionHeader eyebrow={eyebrow} title={heading} italicPart={headingItalic} />
         <div class="themes-grid">
             {themes.map((theme) => {
                 const parts = theme.title.split(theme.accentWord);

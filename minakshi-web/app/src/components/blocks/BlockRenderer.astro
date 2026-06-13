@@ -16,10 +16,19 @@ import FeaturedBookBlock from "./FeaturedBookBlock.astro";
 import LatestArticlesBlock from "./LatestArticlesBlock.astro";
 import FiguresBlock from "./FiguresBlock.astro";
 import BooksGridBlock from "./BooksGridBlock.astro";
-import type { PageBlock } from "./types";
+import BookThemesBlock from "./BookThemesBlock.astro";
+import BookExcerptBlock from "./BookExcerptBlock.astro";
+import BookBehindStatsBlock from "./BookBehindStatsBlock.astro";
+import BookPullQuoteBlock from "./BookPullQuoteBlock.astro";
+import BookAwardsBlock from "./BookAwardsBlock.astro";
+import BookEventsBlock from "./BookEventsBlock.astro";
+import BookReviewsBlock from "./BookReviewsBlock.astro";
+import BookMediaBlock from "./BookMediaBlock.astro";
+import BookBuyBlock from "./BookBuyBlock.astro";
+import type { PageBlock, BookBlock } from "./types";
 
 interface Props {
-    blocks: PageBlock[];
+    blocks: (PageBlock | BookBlock)[];
 }
 
 const { blocks = [] } = Astro.props;
@@ -31,6 +40,15 @@ const REGISTRY = {
     latestArticles: LatestArticlesBlock,
     figures: FiguresBlock,
     booksGrid: BooksGridBlock,
+    'book-themes': BookThemesBlock,
+    'book-excerpt': BookExcerptBlock,
+    'book-behind-stats': BookBehindStatsBlock,
+    'book-pull-quote': BookPullQuoteBlock,
+    'book-awards': BookAwardsBlock,
+    'book-events': BookEventsBlock,
+    'book-reviews': BookReviewsBlock,
+    'book-media': BookMediaBlock,
+    'book-buy': BookBuyBlock,
 } as const;
 ---
 

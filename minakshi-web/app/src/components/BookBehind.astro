@@ -9,14 +9,22 @@ interface Stat {
 
 interface Props {
     stats: Stat[];
+    eyebrow?: string;
+    heading?: string;
+    headingItalic?: string;
 }
 
-const { stats } = Astro.props;
+const {
+    stats,
+    eyebrow = 'How it was made',
+    heading = 'Behind the',
+    headingItalic = 'book.',
+} = Astro.props;
 ---
 
 <section class="behind-section">
     <div class="container">
-        <SectionHeader eyebrow="How it was made" title="Behind the" italicPart="book." />
+        <SectionHeader eyebrow={eyebrow} title={heading} italicPart={headingItalic} />
         <div class="figures">
             {stats.map((stat) => (
                 <div class="figure">

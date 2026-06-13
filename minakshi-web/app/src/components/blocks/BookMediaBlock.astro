@@ -1,0 +1,22 @@
+---
+import BookPressGrid from '../system/BookPressGrid.astro';
+import type { BookMediaBlockData } from './types';
+
+type Props = BookMediaBlockData;
+const { eyebrow, heading, headingItalic, items } = Astro.props;
+
+const pressItems = items.map((m) => ({
+    id: m.id,
+    title: m.title,
+    publication: m.reviewer,
+    url: m.url,
+    type: m.type,
+    date: m.date,
+}));
+---
+<BookPressGrid
+    items={pressItems}
+    eyebrow={eyebrow}
+    heading={heading}
+    headingItalic={headingItalic}
+/>

@@ -100,6 +100,8 @@ export interface PayloadBook {
   behindStats?: PayloadBookStat[];
   pullQuote?: string;
   pullQuoteCite?: string;
+  /** Extra content sections from the book block builder */
+  blocks?: unknown[];
   updatedAt: string;
   createdAt: string;
 }

@@ -10,14 +10,22 @@ interface BuyLink {
 
 interface Props {
     buyLinks: BuyLink[];
+    eyebrow?: string;
+    heading?: string;
+    headingItalic?: string;
 }
 
-const { buyLinks } = Astro.props;
+const {
+    buyLinks,
+    eyebrow = 'Get the book',
+    heading = 'Where to',
+    headingItalic = 'buy.',
+} = Astro.props;
 ---
 
 <section class="buy-section" id="buy">
     <div class="container">
-        <SectionHeader eyebrow="Get the book" title="Where to" italicPart="buy." />
+        <SectionHeader eyebrow={eyebrow} title={heading} italicPart={headingItalic} />
         <div class="buy-grid">
             {buyLinks.map((link) => (
                 <a href={link.url} target="_blank" rel="noopener noreferrer" class="buy-card">

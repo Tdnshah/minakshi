@@ -1,5 +1,8 @@
 ---
+import SectionHeader from './system/SectionHeader.astro';
+
 interface Award {
+    id?: string;
     title: string;
     organization: string;
     year?: number;
@@ -9,56 +12,65 @@ interface Award {
 
 interface Props {
     awards: Award[];
+    eyebrow?: string;
+    heading?: string;
+    headingItalic?: string;
 }
 
-const { awards } = Astro.props;
+const {
+    awards,
+    eyebrow = 'Recognition',
+    heading = 'Awards &',
+    headingItalic = 'longlists.',
+} = Astro.props;
 
-const statusConfig: Record<string, { icon: string; label: string; cls: string }> = {
-    winner:      { icon: '🏆', label: 'Winner',      cls: 'award--winner' },
-    shortlisted: { icon: '🏅', label: 'Shortlisted', cls: 'award--shortlisted' },
-    longlisted:  { icon: '📚', label: 'Longlisted',  cls: 'award--longlisted' },
-    nominated:   { icon: '⭐', label: 'Nominated',   cls: 'award--nominated' },
+const STATUS_LABEL: Record<string, string> = {
+    winner: 'Winner',
+    shortlisted: 'Shortlisted',
+    longlisted: 'Longlisted',
+    nominated: 'Nominated',
 };
-
-function getConfig(status?: string) {
-    return statusConfig[status ?? ''] ?? { icon: '🏅', label: 'Recognised', cls: 'award--shortlisted' };
-}
 ---
 
 <section class="awards-section">
     <div class="container">
-        <div class="section-header">
-            <span class="section-eyebrow">Recognition</span>
-            <h2 class="section-title">Awards &amp; Honours</h2>
-            <div class="section-rule"></div>
-        </div>
-
-        <div class="awards-grid">
+        <SectionHeader eyebrow={eyebrow} title={heading} italicPart={headingItalic} />
+        <div class="work-list">
             {awards.map((award) => {
-                const cfg = getConfig(award.status);
-                return (
-                    <div class={`award-card ${cfg.cls}`}>
-                        <div class="award-icon" aria-hidden="true">{cfg.icon}</div>
-                        <div class="award-body">
-                            <span class="award-status-pill">{cfg.label}</span>
-                            <h3 class="award-title">{award.title}</h3>
-                            <p class="award-org">
-                                {award.organization}
-                                {award.year && <span class="award-year"> · {award.year}</span>}
-                            </p>
-                        </div>
-                        {award.url && (
-                            <a
-                                href={award.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="award-link"
-                                aria-label={`Learn more about ${award.title}`}
-                            >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                            </a>
-                        )}
-                        <div class="award-accent" aria-hidden="true"></div>
+                const label = award.status ? STATUS_LABEL[award.status] : null;
+                const isWinner = award.status === 'winner';
+                return award.url ? (
+                    <a href={award.url} target="_blank" rel="noopener noreferrer" class={`work-item work-item--link${isWinner ? ' work-item--winner' : ''}`}>
+                        <span class="award-icon-wrap">
+                            <svg class="award-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 18 22" fill="none" aria-hidden="true">
+                                <circle cx="9" cy="8" r="6.5" stroke="currentColor" stroke-width="1.25"/>
+                                <path d="M9 4.5L10.1 7.1H13L10.7 8.7L11.6 11.3L9 9.7L6.4 11.3L7.3 8.7L5 7.1H7.9Z" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+                                <path d="M6 14.5L6 21.5L9 19.5L12 21.5L12 14.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span class="title">
+                            {label && <em>{label}</em>}
+                            {label ? ` — ${award.title}` : award.title}
+                        </span>
+                        <span class="outlet">{award.organization}</span>
+                        <span class="date">{award.year}</span>
+                        <span class="arrow">↗</span>
+                    </a>
+                ) : (
+                    <div class={`work-item${isWinner ? ' work-item--winner' : ''}`}>
+                        <span class="award-icon-wrap">
+                            <svg class="award-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 18 22" fill="none" aria-hidden="true">
+                                <circle cx="9" cy="8" r="6.5" stroke="currentColor" stroke-width="1.25"/>
+                                <path d="M9 4.5L10.1 7.1H13L10.7 8.7L11.6 11.3L9 9.7L6.4 11.3L7.3 8.7L5 7.1H7.9Z" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round"/>
+                                <path d="M6 14.5L6 21.5L9 19.5L12 21.5L12 14.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span class="title">
+                            {label && <em>{label}</em>}
+                            {label ? ` — ${award.title}` : award.title}
+                        </span>
+                        <span class="outlet">{award.organization}</span>
+                        <span class="date">{award.year}</span>
                     </div>
                 );
             })}
@@ -68,172 +80,124 @@ function getConfig(status?: string) {
 
 <style>
     .awards-section {
-        padding: var(--spacing-xl) 0;
-        background: linear-gradient(180deg, #FFF8EE 0%, #FFFDF9 100%);
-        border-top: 1px solid var(--color-border);
-        border-bottom: 1px solid var(--color-border);
+        padding: 5rem 0;
+        background: var(--paper);
     }
 
-    .section-header {
-        text-align: center;
-        margin-bottom: var(--spacing-xl);
+    .work-list {
+        border-top: 1px solid var(--ink);
     }
 
-    .section-eyebrow {
-        display: block;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        color: var(--color-secondary);
-        margin-bottom: 0.5rem;
-    }
-
-    .section-title {
-        font-size: clamp(1.75rem, 4vw, 2.25rem);
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .section-rule {
-        width: 50px;
-        height: 3px;
-        background: var(--gradient-warm);
-        border-radius: 2px;
-        margin: 0 auto;
-    }
-
-    /* Awards grid — auto-sizes cards, 1–3 cols */
-    .awards-grid {
+    .work-item {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: var(--spacing-lg);
-        justify-items: center;
-    }
-
-    /* Base card */
-    .award-card {
+        grid-template-columns: 5rem 1fr 14rem 8rem;
+        gap: 1.25rem;
+        padding: 1.25rem 0;
+        border-bottom: 1px solid var(--rule-soft);
+        align-items: center;
         position: relative;
-        width: 100%;
-        background: white;
-        border-radius: 16px;
-        padding: 2rem 1.75rem 1.75rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.07), 0 6px 28px rgba(0,0,0,0.05);
-        border: 1px solid rgba(0,0,0,0.06);
-        display: flex;
-        flex-direction: column;
-        gap: 0.6rem;
-        overflow: hidden;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: background 200ms var(--ease-editorial), padding 200ms var(--ease-editorial);
+        text-decoration: none;
+        color: inherit;
     }
 
-    .award-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 20px rgba(0,0,0,0.10), 0 14px 40px rgba(0,0,0,0.08);
+    .work-item--link {
+        cursor: pointer;
     }
 
-    /* Decorative corner accent */
-    .award-accent {
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 80px;
-        height: 80px;
-        border-radius: 0 16px 0 80px;
-        opacity: 0.06;
+    .work-item--link:hover {
+        background: var(--paper-deep);
+        padding-left: 0.875rem;
+        padding-right: 0.875rem;
     }
 
-    .award--winner .award-accent      { background: #D4A574; opacity: 0.12; }
-    .award--shortlisted .award-accent  { background: #2E7D8C; }
-    .award--longlisted .award-accent   { background: #8B5A8E; }
-    .award--nominated .award-accent    { background: #6A994E; }
-
-    /* Top border stripe */
-    .award-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        border-radius: 16px 16px 0 0;
-    }
-
-    .award--winner::before      { background: linear-gradient(90deg, #D4A574, #E8C49A); }
-    .award--shortlisted::before  { background: linear-gradient(90deg, #2E7D8C, #4A9BAB); }
-    .award--longlisted::before   { background: linear-gradient(90deg, #8B5A8E, #A67BA9); }
-    .award--nominated::before    { background: linear-gradient(90deg, #6A994E, #8AB86A); }
-
-    .award-icon {
-        font-size: 2.2rem;
-        line-height: 1;
-        margin-bottom: 0.25rem;
-    }
-
-    .award-body {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-    }
-
-    .award-status-pill {
-        display: inline-block;
-        font-size: 0.68rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        padding: 2px 10px;
-        border-radius: 20px;
-        width: fit-content;
-        font-family: var(--font-sans);
-    }
-
-    .award--winner .award-status-pill     { background: rgba(212,165,116,0.18); color: #8A5C1A; }
-    .award--shortlisted .award-status-pill { background: rgba(46,125,140,0.12);  color: #2E7D8C; }
-    .award--longlisted .award-status-pill  { background: rgba(139,90,142,0.12);  color: #6B3D6E; }
-    .award--nominated .award-status-pill   { background: rgba(106,153,78,0.12);  color: #4A7830; }
-
-    .award-title {
-        font-size: 1.05rem;
-        font-family: var(--font-serif);
-        line-height: 1.4;
-        color: var(--color-text-light);
-        margin: 0;
-    }
-
-    .award-org {
-        font-size: 0.85rem;
-        color: #777;
-        font-family: var(--font-sans);
-        margin: 0;
-    }
-
-    .award-year {
-        color: #aaa;
-    }
-
-    .award-link {
+    /* Award icon column */
+    .award-icon-wrap {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: rgba(0,0,0,0.05);
-        color: #888;
-        text-decoration: none;
-        align-self: flex-end;
-        transition: background 0.2s, color 0.2s, transform 0.2s;
+        color: var(--ink-soft);
+        transition: color 200ms var(--ease-editorial);
+    }
+
+    .work-item--winner .award-icon-wrap {
+        color: var(--accent);
+    }
+
+    .work-item--link:hover .award-icon-wrap {
+        color: var(--accent);
+    }
+
+    .award-icon {
         flex-shrink: 0;
     }
 
-    .award-link:hover {
-        background: var(--color-primary);
-        color: white;
-        transform: scale(1.1);
+    .title {
+        font-family: var(--font-display);
+        font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        font-variation-settings: "opsz" 24, "SOFT" 30, "WONK" 0;
+        line-height: 1.3;
     }
 
-    @media (max-width: 600px) {
-        .awards-grid { grid-template-columns: 1fr; }
+    .title em {
+        color: var(--accent);
+        font-style: italic;
+    }
+
+    .outlet {
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        color: var(--ink-mid);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .date {
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        color: var(--ink-soft);
+        text-align: right;
+    }
+
+    .arrow {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%) translateX(-1rem);
+        opacity: 0;
+        color: var(--accent);
+        font-size: 1.25rem;
+        transition: all 200ms var(--ease-editorial);
+    }
+
+    .work-item--link:hover .arrow {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+
+    @media (max-width: 760px) {
+        .awards-section {
+            padding: 3.5rem 0;
+        }
+
+        .work-item {
+            grid-template-columns: 3rem 1fr;
+        }
+
+        .outlet,
+        .date {
+            grid-column: 2;
+            font-size: 0.75rem;
+        }
+
+        .date {
+            text-align: left;
+        }
+
+        .award-icon-wrap {
+            justify-content: flex-start;
+        }
     }
 </style>

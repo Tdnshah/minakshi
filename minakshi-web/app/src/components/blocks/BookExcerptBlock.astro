@@ -1,0 +1,13 @@
+---
+import BookExcerpt from '../BookExcerpt.astro';
+import type { BookExcerptBlockData } from './types';
+
+type Props = BookExcerptBlockData;
+const { eyebrow, title, paragraphs, cite } = Astro.props;
+---
+<BookExcerpt
+    eyebrow={eyebrow ?? 'An excerpt'}
+    title={title}
+    paragraphs={paragraphs.map((p) => p.text)}
+    cite={cite ?? ''}
+/>
