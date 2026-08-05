@@ -1,11 +1,15 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import { fetchConsulting } from "../../lib/payload/consulting";
+import { fetchFilms } from "../../lib/payload/films";
 import PageHeader from "../../components/system/PageHeader.astro";
 import SectionHeader from "../../components/system/SectionHeader.astro";
+import ThemedCard from "../../components/system/ThemedCard.astro";
+import EventCard from "../../components/system/EventCard.astro";
+export const prerender = false;
 
-const consulting = await getCollection("consulting");
-const films = await getCollection("films");
+const consulting = await fetchConsulting();
+const films = await fetchFilms();
 ---
 
 <BaseLayout title="Consulting & Collaborations">
@@ -14,7 +18,7 @@ const films = await getCollection("films");
             <PageHeader
                 eyebrow="Practice"
                 title="Consulting & Collaborations"
-                description="Policy, research, and interdisciplinary collaborations across development, health, and media."
+                description="Policy, research, and interdisciplinary collaborations spanning development, health, and media."
             />
 
             <div class="intro">
@@ -31,20 +35,13 @@ const films = await getCollection("films");
             <div class="consulting-grid">
                 {
                     consulting.map((project) => (
-                        <div class="consulting-card">
-                            <h3 class="org-name">
-                                {project.data.organisation}
-                            </h3>
-                            <div class="year-badge">{project.data.year}</div>
-                            <p class="description">
-                                {project.data.description.length > 180 ? project.data.description.slice(0, 180) + "...": project.data.description}
-                            </p>
-                            <div class="domains">
-                                {project.data.domain.map((d) => (
-                                    <span class="domain-tag">{d}</span>
-                                ))}
-                            </div>
-                        </div>
+                        <ThemedCard
+                            eyebrow={project.year}
+                            title={project.organisation}
+                            subtitle={project.title}
+                            description={project.description}
+                            tags={project.domain}
+                        />
                     ))
                 }
             </div>
@@ -57,36 +54,24 @@ const films = await getCollection("films");
 
             <div class="intro">
                 <p>
-                    Dewan brings over two decades of experience in research, policy writing, and program consulting across development, health, gender, and cultural sectors. Her work spans grassroots organisations, international think tanks, and academic institutions.
+                    Documentary and film projects that extend her research into visual and narrative formats, developed in collaboration with filmmakers and cultural institutions.
                 </p>
             </div>
-            
-
 
             <div class="films-list">
                 {
                     films.map((film) => (
-                        <div class="film-card">
-                            <h3 class="film-title">{film.data.title}</h3>
-                            <div class="film-meta">
-                                <span class="collaborator">
-                                    with {film.data.collaborator}
-                                </span>
-                                {film.data.expectedRelease && (
-                                    <span class="release">
-                                        Expected: {film.data.expectedRelease}
-                                    </span>
-                                )}
-                            </div>
-                            <p class="film-description">
-                                {film.data.description}
-                            </p>
-                            {film.data.notes && (
-                                <p class="film-notes">
-                                    <em>{film.data.notes}</em>
-                                </p>
-                            )}
-                        </div>
+                        <EventCard
+                            title={film.title}
+                            meta={[
+                                `with ${film.collaborator}`,
+                                ...(film.expectedRelease
+                                    ? [`Expected ${film.expectedRelease}`]
+                                    : []),
+                            ]}
+                            description={film.description}
+                            note={film.notes}
+                        />
                     ))
                 }
             </div>
@@ -96,110 +81,29 @@ const films = await getCollection("films");
 
 <style>
     .intro {
-        max-width: 800px;
-        margin: 0 auto var(--spacing-xl);
+        max-width: var(--prose, 68ch);
+        margin: 0 auto 3rem;
         text-align: center;
+        font-family: var(--font-display);
+        font-style: italic;
         font-size: 1.1rem;
-        color: #555;
-    }
-
-    .intro {
-        max-width: 800px;
-        margin: 0 auto var(--spacing-xl);
-        text-align: center;
-        font-size: 1.1rem;
-        color: #555;
+        line-height: 1.6;
+        color: var(--ink-mid);
+        font-variation-settings: "opsz" 24, "SOFT" 50;
     }
 
     .consulting-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: var(--spacing-lg);
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .consulting-card {
-        padding: var(--spacing-lg);
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        position: relative;
-    }
-
-    .org-name {
-        font-size: 1.2rem;
-        margin-bottom: var(--spacing-sm);
-        color: var(--color-accent);
-    }
-
-    .year-badge {
-        position: absolute;
-        top: var(--spacing-md);
-        right: var(--spacing-md);
-        background-color: var(--color-accent);
-        color: white;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .description {
-        margin-bottom: var(--spacing-md);
-        line-height: 1.6;
-    }
-
-    .domains {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--spacing-xs);
-    }
-
-    .domain-tag {
-        padding: 0.25rem 0.5rem;
-        background-color: #f0f0f0;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        color: #555;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1px;
+        background: var(--ink);
+        border: 1px solid var(--ink);
+        margin-bottom: 3.5rem;
     }
 
     .films-list {
-        display: grid;
-        gap: var(--spacing-lg);
-    }
-
-    .film-card {
-        padding: var(--spacing-lg);
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        border-left: 4px solid var(--color-accent);
-    }
-
-    .film-title {
-        font-size: 1.3rem;
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .film-meta {
         display: flex;
-        gap: var(--spacing-md);
-        margin-bottom: var(--spacing-md);
-        font-size: 0.9rem;
-        color: #666;
-    }
-
-    .collaborator {
-        font-weight: 600;
-    }
-
-    .film-description {
-        line-height: 1.6;
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .film-notes {
-        font-size: 0.9rem;
-        color: #777;
+        flex-direction: column;
+        border-top: 1px solid var(--ink);
     }
 </style>

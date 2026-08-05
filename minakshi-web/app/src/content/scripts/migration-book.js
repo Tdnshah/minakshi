@@ -12,7 +12,13 @@ const ASTRO_ARTICLES_DIR = path.join(
 );
 
 const PAYLOAD_API = "http://localhost:3002/api/books";
-const PAYLOAD_TOKEN = "009f5a42-af9b-415d-bd84-67312dde3331";
+const PAYLOAD_TOKEN = process.env.PAYLOAD_API_KEY;
+
+if (!PAYLOAD_TOKEN) {
+  throw new Error(
+    "PAYLOAD_API_KEY environment variable is required. Run with `node --env-file=.env migration-book.js` or export it in your shell."
+  );
+}
 
 // Helper: Read all JSON files
 const getArticleFiles = () => {

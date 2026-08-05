@@ -1,5 +1,5 @@
 import { defineCollection, z } from 'astro:content';
-import { payloadApiContentLoader } from '../loaders/payloadLoader';
+import { payloadApiContentLoader } from './loaders/payloadLoader';
 // const blogs = defineCollection({
 //     type: 'content',
 //     schema: z.object({

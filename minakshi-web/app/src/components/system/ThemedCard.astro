@@ -1,0 +1,91 @@
+---
+/**
+ * Hairline 1px-grid card cell (DESIGN.md "themed cards" recipe). Meant to sit
+ * inside a container with `gap: 1px; background: var(--ink); border: 1px
+ * solid var(--ink);` (same wrapper convention as PressGrid) so cells read as
+ * a single ruled grid.
+ */
+interface Props {
+    eyebrow?: string;
+    title: string;
+    subtitle?: string;
+    description: string;
+    tags?: string[];
+}
+
+const { eyebrow, title, subtitle, description, tags = [] } = Astro.props;
+---
+
+<div class="themed-card">
+    {eyebrow && <span class="themed-eyebrow">{eyebrow}</span>}
+    <h3 class="themed-title">{title}</h3>
+    {subtitle && <p class="themed-subtitle">{subtitle}</p>}
+    <p class="themed-description">{description}</p>
+    {
+        tags.length > 0 && (
+            <div class="themed-tags">
+                {tags.map((tag) => (
+                    <span>{tag}</span>
+                ))}
+            </div>
+        )
+    }
+</div>
+
+<style>
+    .themed-card {
+        background: var(--paper);
+        padding: 2rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.875rem;
+        min-height: 18rem;
+        transition: background 0.24s var(--ease-editorial);
+    }
+
+    .themed-card:hover {
+        background: var(--paper-soft);
+    }
+
+    .themed-eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+
+    .themed-title {
+        font-size: 1.5rem !important;
+        margin: 0;
+    }
+
+    .themed-subtitle {
+        font-family: var(--font-display);
+        font-style: italic;
+        color: var(--ink-mid);
+        font-size: 1rem;
+        line-height: 1.4;
+        font-variation-settings: "opsz" 36, "SOFT" 60, "WONK" 1;
+    }
+
+    .themed-description {
+        font-family: var(--font-body);
+        color: var(--ink-mid);
+        font-size: 0.9375rem;
+        line-height: 1.6;
+    }
+
+    .themed-tags {
+        margin-top: auto;
+        padding-top: 0.875rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+    }
+</style>
