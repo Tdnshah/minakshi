@@ -217,7 +217,7 @@ export interface Page {
   blocks?:
     | (
         | {
-            eyebrow: string;
+            eyebrow?: string | null;
             firstName: string;
             lastName: string;
             description: string;

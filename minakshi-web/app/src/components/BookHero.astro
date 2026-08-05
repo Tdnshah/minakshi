@@ -7,11 +7,10 @@ interface Props {
     coverAlt?: string;
     publisher?: string;
     releaseDate?: string;
-    isbn?: string;
     awardsCount?: number;
 }
 
-const { title, subtitle, excerpt, coverImage, coverAlt, publisher, releaseDate, isbn, awardsCount } = Astro.props;
+const { title, subtitle, excerpt, coverImage, coverAlt, publisher, releaseDate, awardsCount } = Astro.props;
 
 const formattedDate = releaseDate
     ? new Date(releaseDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -57,12 +56,6 @@ const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;
                     <div class="meta-item">
                         <dt class="meta-label">Published</dt>
                         <dd class="meta-value">{formattedDate}</dd>
-                    </div>
-                )}
-                {isbn && (
-                    <div class="meta-item">
-                        <dt class="meta-label">ISBN</dt>
-                        <dd class="meta-value">{isbn}</dd>
                     </div>
                 )}
             </dl>
@@ -170,13 +163,12 @@ const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;
 
     .hero-subtitle {
         font-family: var(--font-display);
-        font-style: italic;
         font-size: 1.25rem;
         font-weight: 400;
         color: var(--ink-mid);
         margin: 0;
         line-height: 1.45;
-        font-variation-settings: "opsz" 24, "SOFT" 50, "WONK" 1;
+        font-variation-settings: "opsz" 24, "SOFT" 30, "WONK" 0;
     }
 
     /* Metadata strip */

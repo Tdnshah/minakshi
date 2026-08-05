@@ -57,14 +57,13 @@ const { eyebrow, title, paragraphs, cite } = Astro.props;
 
     h2 {
         font-family: var(--font-display);
-        font-style: italic;
         font-size: clamp(1.5rem, 3.5vw, 2.5rem);
         font-weight: 500;
         line-height: 1.2;
         letter-spacing: -0.02em;
         color: var(--paper);
         margin: 0 0 2rem 0;
-        font-variation-settings: "opsz" 144, "SOFT" 60, "WONK" 1;
+        font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
     }
 
     .excerpt-body {
@@ -84,7 +83,6 @@ const { eyebrow, title, paragraphs, cite } = Astro.props;
     }
 
     p :global(em) {
-        font-style: italic;
         color: var(--paper);
     }
 
