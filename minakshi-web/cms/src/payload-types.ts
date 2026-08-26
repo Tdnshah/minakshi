@@ -634,6 +634,7 @@ export interface Podcast {
   publishedAt: string;
   description?: string | null;
   slug?: string | null;
+  type?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1026,6 +1027,7 @@ export interface PodcastsSelect<T extends boolean = true> {
   publishedAt?: T;
   description?: T;
   slug?: T;
+  type?: T;
   updatedAt?: T;
   createdAt?: T;
 }
