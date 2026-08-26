@@ -74,8 +74,7 @@ h4 { font-size: clamp(1.125rem, 2vw, 1.5rem); font-weight: 600; letter-spacing: 
 p { text-wrap: pretty; }
 
 em, i {
-  font-style: italic;
-  font-variation-settings: "opsz" 144, "SOFT" 50, "WONK" 1;
+  font-style: normal;
 }
 
 strong { font-weight: 600; color: var(--ink); }

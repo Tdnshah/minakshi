@@ -11,7 +11,7 @@ import type { PayloadMedia } from '../../lib/payload/books';
 export interface HeroBlockData {
   blockType: 'hero';
   id?: string;
-  eyebrow: string;
+  eyebrow?: string;
   firstName: string;
   lastName: string;
   description: string;

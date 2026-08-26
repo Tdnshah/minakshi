@@ -70,7 +70,6 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
         coverAlt={`Cover of ${book.title}`}
         publisher={book.publisher}
         releaseDate={book.releaseDate}
-        isbn={book.isbn}
         awardsCount={book.awards?.length ?? 0}
     >
         <Fragment slot="buy">
@@ -187,9 +186,7 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
         border-bottom: 1px solid var(--ink);
     }
 
-    /* Eyebrow is centered over the prose column */
     .synopsis-eyebrow-wrap {
-        text-align: center;
         margin-bottom: 2rem;
     }
 
@@ -231,7 +228,6 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
     .prose :global(p:last-child) { margin-bottom: 0; }
 
     .prose :global(em) {
-        font-style: italic;
         color: var(--ink);
     }
 

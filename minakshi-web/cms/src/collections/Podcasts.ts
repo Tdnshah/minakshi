@@ -15,5 +15,6 @@ export const Podcasts: CollectionConfig = {
     { name: 'publishedAt', type: 'date', required: true },
     { name: 'description', type: 'textarea' },
     { name: 'slug', type: 'text' },
+    { name: 'type', type: 'text' },
   ],
 };
