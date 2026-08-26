@@ -4,7 +4,7 @@ export async function fetchPodcasts(podcastsId) {
 
   if(!podcastsId){
       const json = await payloadFetch<any>(
-        "/api/podcasts?limit=100&where[platform][contains]=youtube"
+        "/api/podcasts?limit=100&where[type][contains]=Podcast"
       );
       if (!json?.docs) return [];
       return json.docs.map((item: any) => ({
