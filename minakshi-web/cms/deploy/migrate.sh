@@ -33,8 +33,12 @@ export NODE_ENV=production
 log "Node:    $(node -v)"
 log "Payload: $(npx --no-install payload --version 2>/dev/null || echo 'unknown')"
 
-# `payload migrate` is idempotent — it only applies un-applied migrations.
+# `payload migrate` is idempotent — it only applies unapplied migrations.
+#
+# Payload may prompt for confirmation when it detects that the database was
+# previously modified by dev-mode auto-push. `-y` does not answer this prompt,
+# so explicitly provide "y" on stdin.
 log "Running payload migrate"
-npx --no-install payload migrate -y
+printf 'y\n' | npx --no-install payload migrate
 
 log "Migrations complete"
