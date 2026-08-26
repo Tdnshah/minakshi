@@ -35,6 +35,6 @@ log "Payload: $(npx --no-install payload --version 2>/dev/null || echo 'unknown'
 
 # `payload migrate` is idempotent — it only applies un-applied migrations.
 log "Running payload migrate"
-npx --no-install payload migrate
+npx --no-install payload migrate -y
 
 log "Migrations complete"
