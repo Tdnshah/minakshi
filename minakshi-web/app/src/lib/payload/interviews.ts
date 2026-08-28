@@ -15,7 +15,7 @@ export async function fetchInterviews(interviewId) {
 
       const query = platforms.map(p => encodeURIComponent(p)).join(",");
       const json = await payloadFetch<any>(
-        `/api/podcasts?limit=100&where[platform][in]=${query}`
+        "/api/podcasts?limit=100&where[type][contains]=Interview"
       );
       console.log(json);
       if (!json?.docs) return [];
