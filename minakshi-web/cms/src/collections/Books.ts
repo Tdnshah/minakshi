@@ -1,4 +1,18 @@
 import { CollectionConfig } from 'payload';
+import { BookThemes } from '../blocks/BookThemes/config';
+import { BookExcerpt } from '../blocks/BookExcerpt/config';
+import { BookBehindStats } from '../blocks/BookBehindStats/config';
+import { BookPullQuote } from '../blocks/BookPullQuote/config';
+import { BookAwardsBlock } from '../blocks/BookAwards/config';
+import { BookEventsBlock } from '../blocks/BookEvents/config';
+import { BookReviews } from '../blocks/BookReviews/config';
+import { BookMedia } from '../blocks/BookMedia/config';
+import { BookBuyBlock } from '../blocks/BookBuy/config';
+
+const bookBlocks = [
+  BookThemes, BookExcerpt, BookBehindStats, BookPullQuote,
+  BookAwardsBlock, BookEventsBlock, BookReviews, BookMedia, BookBuyBlock,
+];
 
 export const Books: CollectionConfig = {
   slug: 'books',
@@ -105,6 +119,15 @@ export const Books: CollectionConfig = {
           admin: { description: 'Optional caption for this photo.' },
         },
       ],
+    },
+    {
+      name: 'blocks',
+      type: 'blocks',
+      blocks: bookBlocks,
+      admin: {
+        description:
+          'Optional extra content sections. Use these to add themes, excerpts, pull quotes, extra press grids, events, or buy links beyond the structured fields above.',
+      },
     },
   ],
 };

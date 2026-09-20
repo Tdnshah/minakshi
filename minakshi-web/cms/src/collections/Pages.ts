@@ -32,6 +32,40 @@ export const Pages: CollectionConfig = {
       },
     },
     {
+      type: 'collapsible',
+      label: 'Navigation',
+      fields: [
+        {
+          name: 'showInNavigation',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: { description: 'Show this page in the site header navigation.' },
+        },
+        {
+          name: 'navigationLabel',
+          type: 'text',
+          admin: {
+            description: 'Optional short label override for menu display. Defaults to title.',
+          },
+        },
+        {
+          name: 'navigationGroup',
+          type: 'select',
+          defaultValue: 'primary',
+          options: [
+            { label: 'Primary Menu', value: 'primary' },
+            { label: 'My Works', value: 'myWorks' },
+            { label: 'Media', value: 'media' },
+          ],
+        },
+        {
+          name: 'navigationOrder',
+          type: 'number',
+          defaultValue: 100,
+        },
+      ],
+    },
+    {
       type: 'group',
       name: 'meta',
       label: 'SEO',
@@ -44,9 +78,11 @@ export const Pages: CollectionConfig = {
     {
       name: 'blocks',
       type: 'blocks',
-      required: true,
-      minRows: 1,
       blocks,
+      admin: {
+        description:
+          'Optional page-builder blocks. Leave empty when this slug should resolve to an Astro file-based page.',
+      },
     },
   ],
 };

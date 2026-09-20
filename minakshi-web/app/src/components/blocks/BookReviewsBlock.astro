@@ -1,0 +1,21 @@
+---
+import BookPressGrid from '../system/BookPressGrid.astro';
+import type { BookReviewsBlockData } from './types';
+
+type Props = BookReviewsBlockData;
+const { eyebrow, heading, headingItalic, reviews } = Astro.props;
+
+const items = reviews.map((r) => ({
+    id: r.id,
+    quote: r.quote,
+    publication: r.author,
+    reviewer: r.reviewer,
+    url: r.source,
+}));
+---
+<BookPressGrid
+    items={items}
+    eyebrow={eyebrow}
+    heading={heading}
+    headingItalic={headingItalic}
+/>

@@ -8,7 +8,7 @@ export const Hero: Block = {
   slug: 'hero',
   labels: { singular: 'Hero', plural: 'Heroes' },
   fields: [
-    { name: 'eyebrow', type: 'text', required: true },
+    { name: 'eyebrow', type: 'text' },
     { name: 'firstName', type: 'text', required: true },
     { name: 'lastName', type: 'text', required: true },
     { name: 'description', type: 'textarea', required: true },

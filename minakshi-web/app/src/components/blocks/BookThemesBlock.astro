@@ -1,0 +1,13 @@
+---
+import BookThemes from '../BookThemes.astro';
+import type { BookThemesBlockData } from './types';
+
+type Props = BookThemesBlockData;
+const { eyebrow, heading, headingItalic, items } = Astro.props;
+---
+<BookThemes
+    themes={items}
+    eyebrow={eyebrow}
+    heading={heading}
+    headingItalic={headingItalic}
+/>

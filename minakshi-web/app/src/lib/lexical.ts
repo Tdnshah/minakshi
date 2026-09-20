@@ -1,4 +1,4 @@
-/** Minimal Payload Lexical JSON → HTML serializer */
+/** Payload Lexical JSON → HTML serializer */
 
 interface LexicalNode {
   type: string;
@@ -10,7 +10,11 @@ interface LexicalNode {
   listType?: 'bullet' | 'number' | 'check';
   url?: string;
   newTab?: boolean;
-  fields?: { url?: string; newTab?: boolean };
+  /** Payload link / relationship / upload fields */
+  fields?: Record<string, unknown>;
+  /** Payload upload node */
+  value?: Record<string, unknown>;
+  relationTo?: string;
   indent?: number;
 }
 
@@ -36,6 +40,40 @@ function serializeChildren(children: LexicalNode[] = []): string {
   return children.map(serializeNode).join('');
 }
 
+function serializeLink(node: LexicalNode): string {
+  const f = node.fields as { url?: string; newTab?: boolean; linkType?: string; doc?: { value?: { slug?: string } } } | undefined;
+  let href = f?.url ?? (node as Record<string, unknown>).url as string ?? '#';
+  if (f?.linkType === 'internal' && f?.doc?.value?.slug) {
+    href = `/${f.doc.value.slug}`;
+  }
+  const target = f?.newTab ? ' target="_blank" rel="noopener noreferrer"' : '';
+  return `<a href="${escape(href)}"${target}>${serializeChildren(node.children)}</a>`;
+}
+
+function serializeBlock(node: LexicalNode): string {
+  const fields = node.fields as Record<string, unknown> | undefined;
+  if (!fields) return '';
+  switch (fields['blockType']) {
+    case 'mediaColumns': {
+      const cols = (fields['columns'] ?? []) as Array<{ image?: { url?: string; alt?: string }; caption?: string }>;
+      const layoutStr = (fields['layout'] as string) ?? '2col';
+      const count = layoutStr === '3col' ? 3 : layoutStr === '4col' ? 4 : 2;
+      const items = cols
+        .filter(c => c.image?.url)
+        .map(c => {
+          const src = escape(c.image!.url!);
+          const alt = escape(c.image!.alt ?? '');
+          const caption = c.caption ? `<figcaption>${escape(c.caption)}</figcaption>` : '';
+          return `<figure><img src="${src}" alt="${alt}" loading="lazy" />${caption}</figure>`;
+        })
+        .join('');
+      return `<div class="media-columns media-columns--${count}col">${items}</div>`;
+    }
+    default:
+      return '';
+  }
+}
+
 function serializeNode(node: LexicalNode): string {
   switch (node.type) {
     case 'text': {
@@ -52,6 +90,8 @@ function serializeNode(node: LexicalNode): string {
     }
     case 'linebreak':
       return '<br />';
+    case 'tab':
+      return '&nbsp;&nbsp;&nbsp;&nbsp;';
     case 'paragraph': {
       const inner = serializeChildren(node.children);
       return inner.trim() ? `<p>${inner}</p>` : '';
@@ -66,17 +106,27 @@ function serializeNode(node: LexicalNode): string {
     }
     case 'listitem':
       return `<li>${serializeChildren(node.children)}</li>`;
-    case 'link': {
-      const href = node.fields?.url ?? node.url ?? '#';
-      const target = (node.fields?.newTab ?? node.newTab)
-        ? ' target="_blank" rel="noopener noreferrer"'
-        : '';
-      return `<a href="${escape(href)}"${target}>${serializeChildren(node.children)}</a>`;
-    }
+    case 'link':
+    case 'autolink':
+      return serializeLink(node);
     case 'quote':
       return `<blockquote>${serializeChildren(node.children)}</blockquote>`;
     case 'horizontalrule':
       return '<hr />';
+    case 'upload': {
+      const media = node.value;
+      if (!media?.url) return '';
+      const src = escape(String(media.url));
+      const alt = escape(String(media.alt ?? ''));
+      const captionVal = (node.fields as Record<string, unknown> | undefined)?.caption;
+      const caption = captionVal ? `<figcaption>${escape(String(captionVal))}</figcaption>` : '';
+      return `<figure class="rich-text-image"><img src="${src}" alt="${alt}" loading="lazy" />${caption}</figure>`;
+    }
+    case 'block':
+      return serializeBlock(node);
+    case 'relationship': {
+      return '';
+    }
     case 'root':
     default:
       return node.children?.length ? serializeChildren(node.children) : '';

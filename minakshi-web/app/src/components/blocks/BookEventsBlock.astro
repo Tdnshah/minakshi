@@ -1,0 +1,14 @@
+---
+import BookEvents from '../BookEvents.astro';
+import type { BookEventsBlockData } from './types';
+
+type Props = BookEventsBlockData;
+const { eyebrow, heading, headingItalic, allEventsHref, events } = Astro.props;
+---
+<BookEvents
+    events={events}
+    eyebrow={eyebrow}
+    heading={heading}
+    headingItalic={headingItalic}
+    allEventsHref={allEventsHref}
+/>

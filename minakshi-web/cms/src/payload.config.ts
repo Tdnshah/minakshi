@@ -1,9 +1,10 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { lexicalEditor, BlocksFeature } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
+import { MediaColumnsBlock } from './blocks/MediaColumns/config'
 import { Articles } from './collections/Articles';
 import { Podcasts } from './collections/Podcasts';
 import { Books } from './collections/Books';
@@ -46,7 +47,12 @@ export default buildConfig({
     Films,
     Consulting,
   ],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({
+    features: ({ defaultFeatures }) => [
+      ...defaultFeatures,
+      BlocksFeature({ blocks: [MediaColumnsBlock] }),
+    ],
+  }),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

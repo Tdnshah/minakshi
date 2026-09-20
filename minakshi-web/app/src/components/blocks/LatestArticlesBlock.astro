@@ -1,23 +1,47 @@
 ---
 import ImageContentCard from "../system/ImageContentCard.astro";
+import { fetchArticles } from "../../lib/payload/articles";
 import type { LatestArticlesBlockData } from "./types";
 
-type Props = LatestArticlesBlockData;
+type Props = Omit<LatestArticlesBlockData, "blockType">;
 
 const {
-    heading,
-    articles,
+    variant = "featured",
+    heading = "Latest",
+    pageSize = 9,
+    articles = [],
     viewAllLabel = "View all →",
     viewAllHref = "/articles",
-} = Astro.props;
+} = Astro.props as Props;
 
-// Keep only populated relationship objects (skip raw IDs if depth=0).
-const populated = articles.filter(
+const fromProps = articles.filter(
     (a): a is Exclude<(typeof articles)[number], string> => typeof a === "object" && a !== null,
 );
+
+const listingSource =
+    variant === "listing"
+        ? (fromProps.length > 0 ? fromProps : await fetchArticles())
+        : fromProps;
+const listingArticles = [...listingSource].sort(
+    (a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf(),
+);
+
+const perPage = Math.max(1, Number(pageSize) || 9);
+const rawPage = Number(Astro.url.searchParams.get("page") ?? 1);
+const totalPages = Math.max(1, Math.ceil(listingArticles.length / perPage));
+const currentPage = Math.min(Math.max(rawPage, 1), totalPages);
+const start = (currentPage - 1) * perPage;
+const pageItems = listingArticles.slice(start, start + perPage);
+const pageHref = (page: number) => `${Astro.url.pathname}?page=${page}`;
+
+function getTagLabel(tags?: Array<{ tag: string }> | string[]): string {
+    if (!tags || tags.length === 0) return "Article";
+    const first = tags[0];
+    return typeof first === "string" ? first : first.tag;
+}
 ---
 
-{populated.length > 0 && (
+{variant === "featured" && fromProps.length > 0 && (
     <section class="home-section latest-writing">
         <div class="container">
             <header class="latest-header">
@@ -25,7 +49,7 @@ const populated = articles.filter(
                 <a href={viewAllHref} class="latest-link">{viewAllLabel}</a>
             </header>
             <div class="latest-grid">
-                {populated.map((article) => (
+                {fromProps.map((article) => (
                     <ImageContentCard
                         href={article.url}
                         external={true}
@@ -39,10 +63,56 @@ const populated = articles.filter(
                             month: "short",
                             year: "numeric",
                         })}
-                        metaRight={article.tags?.[0]?.tag ?? "Article"}
+                        metaRight={getTagLabel(article.tags)}
                     />
                 ))}
             </div>
+        </div>
+    </section>
+)}
+
+{variant === "listing" && pageItems.length > 0 && (
+    <section class="home-section latest-writing latest-writing--listing">
+        <div class="container">
+            <div class="latest-grid">
+                {pageItems.map((article) => (
+                    <ImageContentCard
+                        href={article.url}
+                        external={true}
+                        variant="article"
+                        title={article.title}
+                        imageSrc={article.image}
+                        imageAlt={article.title}
+                        eyebrow={article.platform}
+                        subtitle={article.excerpt}
+                        metaLeft={new Date(article.date).toLocaleDateString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                        })}
+                        metaRight={getTagLabel(article.tags)}
+                    />
+                ))}
+            </div>
+
+            {totalPages > 1 && (
+                <nav class="pagination" aria-label="Articles pagination">
+                    <a
+                        class={`page-link ${currentPage <= 1 ? "is-disabled" : ""}`}
+                        href={currentPage > 1 ? pageHref(currentPage - 1) : undefined}
+                        aria-disabled={currentPage <= 1}
+                    >
+                        Previous
+                    </a>
+                    <span class="page-meta">Page {currentPage} of {totalPages}</span>
+                    <a
+                        class={`page-link ${currentPage >= totalPages ? "is-disabled" : ""}`}
+                        href={currentPage < totalPages ? pageHref(currentPage + 1) : undefined}
+                        aria-disabled={currentPage >= totalPages}
+                    >
+                        Next
+                    </a>
+                </nav>
+            )}
         </div>
     </section>
 )}
@@ -54,6 +124,11 @@ const populated = articles.filter(
 
     .latest-writing {
         border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .latest-writing--listing {
+        border-bottom: 0;
+        padding-top: 0;
     }
 
     .latest-header {
@@ -100,5 +175,41 @@ const populated = articles.filter(
         .latest-grid {
             grid-template-columns: 1fr;
         }
+    }
+
+    .pagination {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .page-link {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.5rem 0.75rem;
+        border: 1px solid var(--rule-soft);
+        color: var(--ink);
+    }
+
+    .page-link:hover {
+        border-color: var(--ink);
+    }
+
+    .page-link.is-disabled {
+        pointer-events: none;
+        color: var(--ink-soft);
+        border-color: var(--rule-soft);
+    }
+
+    .page-meta {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--ink-mid);
     }
 </style>

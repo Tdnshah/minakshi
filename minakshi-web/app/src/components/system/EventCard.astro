@@ -1,0 +1,113 @@
+---
+/**
+ * Text-first hairline list row for entries with a meta line (institution ·
+ * location, collaborator · release date, etc.), a title, an optional
+ * description, and optional links/notes. Used by Conferences and by the
+ * Consulting page's film/documentary list.
+ */
+interface EventLink {
+    label: string;
+    url: string;
+}
+
+interface Props {
+    title: string;
+    meta?: string[];
+    description?: string;
+    links?: EventLink[];
+    note?: string;
+}
+
+const { title, meta = [], description, links = [], note } = Astro.props;
+---
+
+<article class="event-card">
+    {
+        meta.length > 0 && (
+            <div class="event-meta">{meta.join(" · ")}</div>
+        )
+    }
+    <h3 class="event-title">{title}</h3>
+    {description && <p class="event-description">{description}</p>}
+    {
+        links.length > 0 && (
+            <div class="event-links">
+                {links.map((link) => (
+                    <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="event-link"
+                    >
+                        {link.label} →
+                    </a>
+                ))}
+            </div>
+        )
+    }
+    {
+        note && (
+            <p class="event-note">
+                <em>{note}</em>
+            </p>
+        )
+    }
+</article>
+
+<style>
+    .event-card {
+        padding: 2rem 0;
+        border-bottom: 1px solid var(--rule-soft);
+    }
+
+    .event-meta {
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        margin-bottom: 0.5rem;
+    }
+
+    .event-title {
+        font-size: 1.5rem !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .event-description {
+        font-family: var(--font-body);
+        color: var(--ink-mid);
+        font-size: 0.9375rem;
+        line-height: 1.65;
+        max-width: 68ch;
+    }
+
+    .event-links {
+        display: flex;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+        margin-top: 0.875rem;
+    }
+
+    .event-link {
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--accent);
+        border-bottom: 1px solid var(--accent);
+        padding-bottom: 1px;
+        transition: color 0.15s var(--ease-editorial), border-color 0.15s var(--ease-editorial);
+    }
+
+    .event-link:hover {
+        color: var(--accent-deep);
+        border-color: var(--accent-deep);
+    }
+
+    .event-note {
+        font-family: var(--font-body);
+        font-size: 0.875rem;
+        color: var(--ink-soft);
+        margin-top: 0.75rem;
+    }
+</style>

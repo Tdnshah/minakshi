@@ -1,0 +1,13 @@
+---
+import BookAwards from '../BookAwards.astro';
+import type { BookAwardsBlockData } from './types';
+
+type Props = BookAwardsBlockData;
+const { eyebrow, heading, headingItalic, items } = Astro.props;
+---
+<BookAwards
+    awards={items}
+    eyebrow={eyebrow}
+    heading={heading}
+    headingItalic={headingItalic}
+/>

@@ -1,0 +1,8 @@
+---
+import BookPullQuote from '../BookPullQuote.astro';
+import type { BookPullQuoteBlockData } from './types';
+
+type Props = BookPullQuoteBlockData;
+const { quote, cite } = Astro.props;
+---
+<BookPullQuote quote={quote} cite={cite} />

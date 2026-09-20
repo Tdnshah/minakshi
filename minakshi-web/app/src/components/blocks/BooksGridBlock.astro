@@ -1,0 +1,32 @@
+---
+import BooksGrid from "../system/BooksGrid.astro";
+import SectionHeader from "../system/SectionHeader.astro";
+import { fetchBooks } from "../../lib/payload/books";
+import type { BooksGridBlockData } from "./types";
+
+type Props = BooksGridBlockData;
+
+const { heading, description, maxItems = 0 } = Astro.props;
+
+const books = await fetchBooks();
+const sortedBooks = books.sort(
+    (a, b) => new Date(b.releaseDate).valueOf() - new Date(a.releaseDate).valueOf(),
+);
+const limitedBooks = maxItems > 0 ? sortedBooks.slice(0, maxItems) : sortedBooks;
+---
+
+{limitedBooks.length > 0 && (
+    <section class="books-grid-block">
+        <div class="container">
+            <SectionHeader eyebrow="Written Works" title={heading} description={description} />
+            <BooksGrid books={limitedBooks} />
+        </div>
+    </section>
+)}
+
+<style>
+    .books-grid-block {
+        background: var(--paper-deep);
+        padding: clamp(3rem, 6vw, 5rem) 0;
+    }
+</style>

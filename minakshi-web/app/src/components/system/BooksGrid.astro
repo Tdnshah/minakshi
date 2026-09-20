@@ -1,0 +1,49 @@
+---
+import ImageContentCard from "./ImageContentCard.astro";
+import { toSlug, type PayloadBook } from "../../lib/payload/books";
+
+interface Props {
+    books: PayloadBook[];
+}
+
+const { books = [] } = Astro.props;
+---
+
+<div class="books-grid">
+    {books.map((book) => {
+        const slug = toSlug(book.title);
+        const year = new Date(book.releaseDate).getFullYear();
+        return (
+            <ImageContentCard
+                variant="book"
+                href={`/books/${slug}`}
+                title={book.title}
+                imageSrc={book.coverImage?.url}
+                imageAlt={book.title}
+                subtitle={book.subtitle}
+                metaLeft={book.publisher ?? ""}
+                metaRight={String(year)}
+            />
+        );
+    })}
+</div>
+
+<style>
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 1024px) {
+        .books-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .books-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>

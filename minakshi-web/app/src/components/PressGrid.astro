@@ -1,8 +1,14 @@
 ---
-import type { CollectionEntry } from "astro:content";
+interface PressItem {
+    title: string;
+    type: string;
+    outlet: string;
+    url: string;
+    date: Date;
+}
 
 interface Props {
-    items: CollectionEntry<"press">[];
+    items: PressItem[];
 }
 
 const { items } = Astro.props;
@@ -13,9 +19,9 @@ const { items } = Astro.props;
         items.map((item) => (
             <div class="press-item">
                 <div class="press-meta">
-                    <span class="press-type">{item.data.type}</span>
+                    <span class="press-type">{item.type}</span>
                     <span class="press-date">
-                        {item.data.date.toLocaleDateString("en-US", {
+                        {item.date.toLocaleDateString("en-US", {
                             year: "numeric",
                             month: "short",
                         })}
@@ -23,15 +29,15 @@ const { items } = Astro.props;
                 </div>
                 <h3 class="press-title">
                     <a
-                        href={item.data.url}
+                        href={item.url}
                         target="_blank"
                         rel="noopener noreferrer"
                     >
-                        {item.data.title}
+                        {item.title}
                     </a>
                 </h3>
                 <div class="press-outlet">
-                    Published in <strong>{item.data.outlet}</strong>
+                    Published in <strong>{item.outlet}</strong>
                 </div>
             </div>
         ))

@@ -1,390 +1,228 @@
 ---
+import SectionHeader from './system/SectionHeader.astro';
+
 interface BookEvent {
+    id?: string;
     name: string;
     date: string;
     venue?: string;
     city?: string;
     description?: string;
     url?: string;
+    role?: string;
 }
 
 interface Props {
     events: BookEvent[];
+    eyebrow?: string;
+    heading?: string;
+    headingItalic?: string;
+    allEventsHref?: string;
 }
 
-const { events } = Astro.props;
+const {
+    events,
+    eyebrow = 'Coming up',
+    heading = 'The book on',
+    headingItalic = 'tour.',
+    allEventsHref = '/events',
+} = Astro.props;
 
-const now = new Date();
+const sorted = [...events].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+);
 
-function formatEventDate(dateStr: string): string {
-    try {
-        return new Date(dateStr).toLocaleDateString('en-IN', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-        });
-    } catch {
-        return dateStr;
-    }
+function dateParts(dateStr: string) {
+    const d = new Date(dateStr);
+    return {
+        day: d.getUTCDate().toString().padStart(2, '0'),
+        month: d.toLocaleDateString('en-IN', { month: 'long', timeZone: 'UTC' }),
+        year: d.getUTCFullYear().toString(),
+    };
 }
-
-function formatMonth(dateStr: string): string {
-    try {
-        return new Date(dateStr).toLocaleDateString('en-IN', { month: 'short' }).toUpperCase();
-    } catch {
-        return '';
-    }
-}
-
-function formatDay(dateStr: string): string {
-    try {
-        return new Date(dateStr).getDate().toString();
-    } catch {
-        return '';
-    }
-}
-
-function formatYear(dateStr: string): string {
-    try {
-        return new Date(dateStr).getFullYear().toString();
-    } catch {
-        return '';
-    }
-}
-
-function isPast(dateStr: string): boolean {
-    try {
-        return new Date(dateStr) < now;
-    } catch {
-        return false;
-    }
-}
-
-// Sort events: upcoming first (chronological), then past (most recent first)
-const upcoming = events
-    .filter(e => !isPast(e.date))
-    .sort((a, b) => new Date(a.date).valueOf() - new Date(b.date).valueOf());
-
-const past = events
-    .filter(e => isPast(e.date))
-    .sort((a, b) => new Date(b.date).valueOf() - new Date(a.date).valueOf());
-
-const sortedEvents = [...upcoming, ...past];
 ---
 
 <section class="events-section">
     <div class="container">
-        <div class="section-header">
-            <span class="section-eyebrow">On the Road</span>
-            <h2 class="section-title">Book Events</h2>
-            <div class="section-rule"></div>
-        </div>
-
-        {upcoming.length > 0 && (
-            <p class="upcoming-label">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                {upcoming.length} upcoming event{upcoming.length > 1 ? 's' : ''}
-            </p>
-        )}
-
-        <div class="timeline">
-            {sortedEvents.map((event) => {
-                const past = isPast(event.date);
-                return (
-                    <div class={`timeline-item ${past ? 'timeline-item--past' : 'timeline-item--upcoming'}`}>
-                        <!-- Date block -->
-                        <div class="timeline-date-block" aria-hidden="true">
-                            <span class="date-month">{formatMonth(event.date)}</span>
-                            <span class="date-day">{formatDay(event.date)}</span>
-                            <span class="date-year">{formatYear(event.date)}</span>
-                        </div>
-
-                        <!-- Connector -->
-                        <div class="timeline-connector">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-line"></div>
-                        </div>
-
-                        <!-- Content card -->
-                        <div class="timeline-card">
-                            {!past && <span class="upcoming-chip">Upcoming</span>}
-                            <h3 class="event-name">{event.name}</h3>
-
-                            {(event.venue || event.city) && (
-                                <p class="event-location">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                                    <span>
-                                        {event.venue}
-                                        {event.venue && event.city && <span class="location-sep">,</span>}
-                                        {event.city && <span class="location-city"> {event.city}</span>}
-                                    </span>
-                                </p>
-                            )}
-
-                            {event.description && (
-                                <p class="event-description">{event.description}</p>
-                            )}
-
-                            {event.url && (
-                                <a
-                                    href={event.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="event-link"
-                                >
-                                    {past ? 'View recording' : 'Event details'}
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-                                </a>
-                            )}
-                        </div>
+        <SectionHeader
+            eyebrow={eyebrow}
+            title={heading}
+            italicPart={headingItalic}
+            actionLabel="All events →"
+            actionHref={allEventsHref}
+        />
+        {sorted.map((event) => {
+            const { day, month, year } = dateParts(event.date);
+            const venue = [event.venue, event.city].filter(Boolean).join(' · ');
+            return (
+                <div class="event">
+                    <div class="date-block">
+                        <div class="day">{day}</div>
+                        <span class="month">{month}</span>
+                        <span class="year">{year}</span>
                     </div>
-                );
-            })}
-        </div>
+                    <div class="event-body">
+                        <h3>
+                            {event.url ? (
+                                <a href={event.url} target="_blank" rel="noopener noreferrer">
+                                    {event.name}
+                                </a>
+                            ) : event.name}
+                        </h3>
+                        {venue && <span class="venue">{venue}</span>}
+                        {event.description && <p class="desc">{event.description}</p>}
+                        {event.url && (
+                            <a class="event-link" href={event.url} target="_blank" rel="noopener noreferrer">
+                                Event details ↗
+                            </a>
+                        )}
+                    </div>
+                    {event.role && <span class="role">{event.role}</span>}
+                </div>
+            );
+        })}
     </div>
 </section>
 
 <style>
     .events-section {
-        padding: var(--spacing-xl) 0;
-        background: white;
-        border-top: 1px solid var(--color-border);
+        padding: 5rem 0;
+        background: var(--paper);
     }
 
-    .section-header {
-        text-align: center;
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .section-eyebrow {
-        display: block;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        color: var(--color-primary);
-        margin-bottom: 0.5rem;
-    }
-
-    .section-title {
-        font-size: clamp(1.75rem, 4vw, 2.25rem);
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .section-rule {
-        width: 50px;
-        height: 3px;
-        background: var(--gradient-primary);
-        border-radius: 2px;
-        margin: 0 auto;
-    }
-
-    .upcoming-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--color-primary);
-        background: rgba(46,125,140,0.08);
-        padding: 5px 16px;
-        border-radius: 20px;
-        margin-bottom: var(--spacing-xl);
-        font-family: var(--font-sans);
-    }
-
-    /* Timeline layout */
-    .timeline {
-        max-width: 780px;
-        margin: 0 auto;
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-    }
-
-    .timeline-item {
+    /* Each event row — 3-col grid matching reference */
+    .event {
         display: grid;
-        grid-template-columns: 72px 28px 1fr;
-        gap: 0 1.25rem;
-        align-items: flex-start;
+        grid-template-columns: 6rem 1fr 12rem;
+        gap: 1.25rem;
+        padding: 2rem 0;
+        border-bottom: 1px solid var(--rule-soft);
+        align-items: start;
     }
 
-    /* Date block */
-    .timeline-date-block {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        padding-top: 1.25rem;
-        min-width: 68px;
+    /* ── Date box ── */
+    .date-block {
+        font-family: var(--font-display);
+        text-align: center;
+        padding: 0.875rem;
+        border: 1px solid var(--ink);
     }
 
-    .date-month {
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        color: var(--color-primary);
-        font-family: var(--font-sans);
+    .day {
+        display: block;
+        font-size: 2.25rem;
+        font-weight: 600;
         line-height: 1;
+        letter-spacing: -0.04em;
     }
 
-    .date-day {
-        font-size: 1.75rem;
-        font-weight: 700;
-        font-family: var(--font-serif);
-        line-height: 1;
-        color: var(--color-text-light);
-    }
-
-    .timeline-item--past .date-day { color: #bbb; }
-
-    .date-year {
-        font-size: 0.7rem;
-        color: #aaa;
-        font-family: var(--font-sans);
-        line-height: 1.4;
-    }
-
-    /* Connector (dot + vertical line) */
-    .timeline-connector {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top: 1.35rem;
-    }
-
-    .timeline-dot {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        border: 2px solid var(--color-primary);
-        background: white;
-        flex-shrink: 0;
-        position: relative;
-        z-index: 1;
-        transition: background 0.2s;
-    }
-
-    .timeline-item--upcoming .timeline-dot {
-        background: var(--color-primary);
-        box-shadow: 0 0 0 4px rgba(46,125,140,0.15);
-    }
-
-    .timeline-item--past .timeline-dot {
-        border-color: #ddd;
-        background: #f5f5f5;
-    }
-
-    .timeline-line {
-        width: 2px;
-        flex: 1;
-        background: var(--color-border);
-        min-height: 20px;
-        margin-top: 4px;
-    }
-
-    .timeline-item:last-child .timeline-line { display: none; }
-
-    /* Content card */
-    .timeline-card {
-        background: white;
-        border: 1px solid var(--color-border);
-        border-radius: 12px;
-        padding: 1.25rem 1.5rem;
-        margin-bottom: 1.5rem;
-        position: relative;
-        transition: box-shadow 0.25s ease, transform 0.25s ease;
-    }
-
-    .timeline-item--upcoming .timeline-card {
-        border-color: rgba(46,125,140,0.25);
-        box-shadow: 0 2px 12px rgba(46,125,140,0.08);
-    }
-
-    .timeline-card:hover {
-        box-shadow: 0 4px 20px rgba(0,0,0,0.10);
-        transform: translateX(4px);
-    }
-
-    .timeline-item--past .timeline-card {
-        background: #fafafa;
-    }
-
-    .upcoming-chip {
-        display: inline-block;
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
+    .month {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.14em;
         text-transform: uppercase;
-        background: rgba(46,125,140,0.1);
-        color: var(--color-primary);
-        padding: 2px 10px;
-        border-radius: 20px;
-        margin-bottom: 0.5rem;
-        font-family: var(--font-sans);
+        color: var(--accent);
+        margin-top: 0.3rem;
     }
 
-    .event-name {
-        font-size: 1.05rem;
-        font-family: var(--font-serif);
-        line-height: 1.4;
-        color: var(--color-text-light);
-        margin: 0 0 0.4rem;
+    .year {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.14em;
+        color: var(--ink-soft);
+        margin-top: 0.2rem;
     }
 
-    .timeline-item--past .event-name { color: #777; }
-
-    .event-location {
+    /* ── Event body (middle column) ── */
+    .event-body {
         display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 0.85rem;
-        color: #888;
-        font-family: var(--font-sans);
-        margin: 0 0 0.5rem;
+        flex-direction: column;
     }
 
-    .event-location svg { color: var(--color-secondary); flex-shrink: 0; }
+    .event-body h3 {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 500;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+        margin: 0 0 0.5rem;
+        font-variation-settings: "opsz" 24, "SOFT" 30, "WONK" 0;
+        color: var(--ink);
+    }
 
-    .event-description {
-        font-size: 0.9rem;
-        color: #777;
+    .event-body h3 a {
+        color: inherit;
+        text-decoration: none;
+        transition: color 0.15s var(--ease-editorial);
+    }
+
+    .event-body h3 a:hover {
+        color: var(--accent);
+    }
+
+    .venue {
+        display: block;
+        font-family: var(--font-mono);
+        font-size: 0.8125rem;
+        color: var(--ink-mid);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .desc {
+        display: block;
+        color: var(--ink-mid);
+        margin-top: 0.875rem;
+        font-size: 0.9375rem;
         line-height: 1.65;
-        margin: 0 0 0.75rem;
     }
 
     .event-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 0.83rem;
-        font-weight: 700;
-        color: var(--color-primary);
+        display: inline-block;
+        margin-top: 0.75rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--accent);
         text-decoration: none;
-        font-family: var(--font-sans);
-        transition: gap 0.2s, color 0.2s;
+        transition: color 0.15s var(--ease-editorial);
     }
 
     .event-link:hover {
-        gap: 8px;
-        color: var(--color-accent);
+        color: var(--accent-deep);
     }
 
-    /* Responsive: collapse date block on mobile */
-    @media (max-width: 600px) {
-        .timeline-item {
-            grid-template-columns: 0 24px 1fr;
-            gap: 0 0.75rem;
+    /* ── Role chip (right column) ── */
+    .role {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+        padding: 0.4rem 0.7rem;
+        border: 1px solid var(--accent);
+        justify-self: end;
+        align-self: start;
+    }
+
+    @media (max-width: 760px) {
+        .events-section {
+            padding: 3.5rem 0;
         }
 
-        .timeline-date-block { display: none; }
+        .event {
+            grid-template-columns: 5rem 1fr;
+            gap: 1rem;
+        }
 
-        .timeline-card::before {
-            content: attr(data-date);
-            display: block;
-            font-size: 0.75rem;
-            color: #aaa;
-            margin-bottom: 0.4rem;
-            font-family: var(--font-sans);
+        .role {
+            grid-column: 2;
+            justify-self: start;
+            margin-top: 1.25rem;
         }
     }
 </style>

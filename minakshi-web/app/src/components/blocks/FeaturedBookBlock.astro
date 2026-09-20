@@ -29,7 +29,6 @@ const populated = typeof book === "object" && book !== null;
         meta={[
             { label: "Publisher", value: book.publisher },
             { label: "Year", value: new Date(book.releaseDate).getFullYear() },
-            ...(book.isbn ? [{ label: "ISBN", value: book.isbn }] : []),
         ]}
         actions={[
             { href: `/books/${toSlug(book.title)}`, label: primaryActionLabel, variant: "primary" },

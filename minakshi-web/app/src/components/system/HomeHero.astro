@@ -6,7 +6,7 @@ interface HeroAction {
 }
 
 interface Props {
-    eyebrow: string;
+    eyebrow?: string;
     firstName: string;
     lastName: string;
     description: string;
@@ -33,7 +33,7 @@ const {
 <header class="hero">
     <div class="container hero-grid">
         <div class="hero-text">
-            <p class="eyebrow">{eyebrow}</p>
+            {eyebrow && <p class="eyebrow">{eyebrow}</p>}
             <h1 class="hero-name">
                 {firstName}
                 <em>{lastName}</em>
@@ -91,10 +91,9 @@ const {
 
     .hero-name em {
         display: block;
-        font-style: italic;
         color: var(--accent);
         font-weight: 500;
-        font-variation-settings: "opsz" 144, "SOFT" 80, "WONK" 1;
+        font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
     }
 
     .hero-desc {
