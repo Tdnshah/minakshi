@@ -10,6 +10,13 @@
 
 set -euo pipefail
 
+# appleboy/ssh-action runs a non-interactive, non-login shell, so ~/.bashrc
+# (where nvm normally wires up PATH) is never sourced. Load nvm explicitly.
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+# shellcheck disable=SC1091
+[ -s "${NVM_DIR}/nvm.sh" ] && \. "${NVM_DIR}/nvm.sh"
+nvm use 20.20.2 >/dev/null
+
 PUBLIC_HTML="/home/minakshidewan/domains/cms.minakshidewan.com/public_html"
 SHARED_DIR="/home/minakshidewan/domains/cms.minakshidewan.com/shared"
 APP_NAME="payload-cms"
