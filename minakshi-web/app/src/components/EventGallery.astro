@@ -7,334 +7,1113 @@ interface GalleryImage {
 
 interface Props {
     images: GalleryImage[];
+    eyebrow?: string;
+    heading?: string;
+    headingItalic?: string;
 }
 
-const { images } = Astro.props;
+const {
+    images,
+    eyebrow = "Media Kit",
+    heading = "Gallery",
+    headingItalic = "",
+} = Astro.props;
+
+const pad = (n: number) => String(n).padStart(2, "0");
+const total = images.length;
 ---
 
-<section class="event-gallery">
-    <div class="container">
-        <div class="section-header">
-            <span class="section-eyebrow">In the World</span>
-            <h2 class="section-title">Event Gallery</h2>
-            <div class="section-rule"></div>
-            <p class="section-subtitle">{images.length} photo{images.length !== 1 ? 's' : ''} from book events &amp; signings</p>
+<section class="reel" data-reel aria-label="Event gallery">
+    <div class="reel-pin" data-pin>
+        <div class="reel-panel">
+            <div class="panel-top">
+                <p class="reel-eyebrow">{eyebrow}</p>
+                <h2 class="reel-title">
+                    {heading} <em>{headingItalic}</em>
+                </h2>
+                <p class="reel-sub">
+                    {total} photograph{total !== 1 ? "s" : ""} from book events and signings.
+                </p>
+            </div>
+
+            <div class="panel-mid" aria-hidden="true">
+                <div class="count">
+                    <span class="count-window">
+                        <span class="count-roll" data-roll>
+                            {images.map((_, i) => <span>{pad(i + 1)}</span>)}
+                        </span>
+                    </span>
+                    <span class="count-total">/ {pad(total)}</span>
+                </div>
+            </div>
+
+            <div class="panel-bottom">
+                <p class="reel-caption" data-caption aria-live="polite">
+                    {images[0]?.caption ?? ""}
+                </p>
+                <div class="ticks" data-ticks>
+                    {
+                        images.map((_, i) => (
+                            <button
+                                type="button"
+                                class="tick"
+                                data-index={i}
+                                aria-label={`Go to photo ${i + 1}`}
+                            />
+                        ))
+                    }
+                </div>
+                <p class="scroll-hint" aria-hidden="true">Scroll <span>→</span></p>
+            </div>
         </div>
 
-        <div class="gallery-masonry" id="gallery-grid">
-            {images.map((img, i) => (
-                <button
-                    class="gallery-item"
-                    data-src={img.url}
-                    data-alt={img.caption ?? img.alt ?? `Event photo ${i + 1}`}
-                    aria-label={`View photo ${i + 1}${img.caption ? ': ' + img.caption : ''}`}
-                    type="button"
-                >
-                    <div class="gallery-img-wrap">
-                        <img src={img.url} alt={img.alt ?? `Event photo ${i + 1}`} loading="lazy" />
-                        <div class="gallery-overlay">
-                            <div class="overlay-icon">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-                            </div>
-                        </div>
-                    </div>
-                    {img.caption && <p class="gallery-caption">{img.caption}</p>}
-                </button>
-            ))}
+        <div class="reel-viewport" data-viewport>
+            <ul class="reel-track" data-track role="list">
+                {
+                    images.map((img, i) => {
+                        return (
+                            <li class="frame" data-frame>
+                                <button
+                                    type="button"
+                                    class="frame-btn"
+                                    data-index={i}
+                                    aria-label={`Open photo ${i + 1} of ${total}${img.caption ? `: ${img.caption}` : ""}`}
+                                >
+                                    <figure class="frame-fig">
+                                        <img
+                                            class="frame-bg"
+                                            src={img.url}
+                                            alt=""
+                                            aria-hidden="true"
+                                            loading="lazy"
+                                            decoding="async"
+                                            draggable="false"
+                                        />
+                                        <img
+                                            class="frame-img"
+                                            src={img.url}
+                                            alt={img.alt ?? img.caption ?? `Event photo ${i + 1}`}
+                                            decoding="async"
+                                            data-caption={img.caption ?? ""}
+                                            draggable="false"
+                                        />
+                                    </figure>
+                                    <span class="frame-meta">
+                                        <span class="frame-no">{pad(i + 1)}</span>
+                                        {img.caption && (
+                                            <span class="frame-cap">{img.caption}</span>
+                                        )}
+                                    </span>
+                                </button>
+                            </li>
+                        );
+                    })
+                }
+            </ul>
+            <span class="cursor" aria-hidden="true">Open</span>
         </div>
     </div>
 
-    <!-- Lightbox -->
-    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" hidden>
-        <button class="lightbox-close" id="lightbox-close" aria-label="Close">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </button>
-        <button class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Previous photo">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="lightbox-content">
-            <img class="lightbox-img" id="lightbox-img" src="" alt="" />
-            <p class="lightbox-caption" id="lightbox-caption"></p>
+    <div
+        class="lightbox"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Event photo viewer"
+        hidden
+    >
+        <div class="lb-backdrop"></div>
+        <div class="lb-topbar">
+            <span class="lb-counter" aria-live="polite"></span>
+            <button type="button" class="lb-btn lb-close" aria-label="Close viewer">
+                Close <span aria-hidden="true">✕</span>
+            </button>
         </div>
-        <button class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Next photo">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-        <div class="lightbox-counter" id="lightbox-counter"></div>
+        <button type="button" class="lb-btn lb-nav lb-prev" aria-label="Previous photo">←</button>
+        <button type="button" class="lb-btn lb-nav lb-next" aria-label="Next photo">→</button>
+        <figure class="lb-stage">
+            <img class="lb-img" src="" alt="" draggable="false" />
+            <figcaption class="lb-caption"></figcaption>
+        </figure>
+        <div class="lb-strip" role="tablist" aria-label="All photos">
+            {
+                images.map((img, i) => (
+                    <button
+                        type="button"
+                        class="lb-thumb"
+                        role="tab"
+                        data-index={i}
+                        aria-label={`Go to photo ${i + 1}`}
+                    >
+                        <img src={img.url} alt="" loading="lazy" draggable="false" />
+                    </button>
+                ))
+            }
+        </div>
     </div>
 </section>
 
 <style>
-    .event-gallery {
-        padding: var(--spacing-xl) 0;
-        background: var(--color-bg-light);
-        border-top: 1px solid var(--color-border);
-    }
-
-    .section-header {
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .section-eyebrow {
-        display: block;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.15em;
-        text-transform: uppercase;
-        color: var(--color-primary);
-        margin-bottom: 0.5rem;
-    }
-
-    .section-title {
-        font-size: clamp(1.75rem, 4vw, 2.25rem);
-        margin-bottom: 0.5rem;
-    }
-
-    .section-rule {
-        width: 50px;
-        height: 3px;
-        background: var(--gradient-primary);
-        border-radius: 2px;
-        margin: 0 0 0.75rem;
-    }
-
-    .section-subtitle {
-        font-size: 0.9rem;
-        color: #999;
-        font-family: var(--font-sans);
-        margin: 0;
-    }
-
-    /* Masonry-style CSS columns */
-    .gallery-masonry {
-        column-count: 3;
-        column-gap: 14px;
-    }
-
-    .gallery-item {
-        display: block;
-        width: 100%;
-        break-inside: avoid;
-        margin-bottom: 14px;
-        border: none;
-        padding: 0;
-        background: transparent;
-        cursor: pointer;
-        border-radius: 10px;
-        overflow: hidden;
-        text-align: left;
-    }
-
-    .gallery-img-wrap {
+    /* A dark "darkroom" band: breaks the paper rhythm of the page so the
+       photographs are the brightest thing on screen. */
+    .reel {
+        --glow: #e0a090;
         position: relative;
-        overflow: hidden;
-        border-radius: 10px;
-        background: var(--color-border);
+        background: var(--ink);
+        color: var(--paper);
+        border-top: 1px solid var(--ink);
+        overflow: clip;
     }
 
-    .gallery-item img {
-        width: 100%;
+    /* ── Default (touch / small / reduced motion): swipeable strip ── */
+    .reel-pin {
+        padding: 4rem 0 3.5rem;
+    }
+
+    .reel-panel {
+        padding: 0 var(--spacing-md) 2rem;
+        max-width: var(--container-width);
+        margin: 0 auto;
+    }
+
+    .panel-mid,
+    .ticks,
+    .scroll-hint,
+    .reel-caption {
+        display: none;
+    }
+
+    .reel-eyebrow {
+        margin: 0 0 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--glow);
+    }
+
+    .reel-eyebrow::before {
+        content: "";
+        width: 1.5rem;
+        height: 1px;
+        background: var(--glow);
+    }
+
+    .reel-title {
+        margin: 0;
+        font-family: var(--font-display);
+        font-weight: 400;
+        font-size: clamp(2.75rem, 9vw, 5.5rem);
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        color: var(--paper);
+        font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 0;
+    }
+
+    .reel-title em {
+        color: var(--glow);
+        font-variation-settings: "opsz" 144, "SOFT" 100, "WONK" 1;
+    }
+
+    .reel-sub {
+        margin: 1.25rem 0 0;
+        max-width: 34ch;
+        font-family: var(--font-body);
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: var(--rule-soft);
+    }
+
+    .reel-viewport {
+        position: relative;
+    }
+
+    .reel-track {
+        list-style: none;
+        margin: 0;
+        padding: 0 var(--spacing-md);
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+    }
+
+    .reel-track::-webkit-scrollbar {
+        display: none;
+    }
+
+    .frame {
+        flex: none;
+        scroll-snap-align: center;
+    }
+
+    .frame-btn {
         display: block;
-        transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        padding: 0;
+        border: 0;
+        background: none;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
     }
 
-    .gallery-overlay {
+    .frame-btn:focus-visible {
+        outline: 2px solid var(--glow);
+        outline-offset: 6px;
+    }
+
+    /* Every frame is the same 3:2 box. The photo is shown whole (contain);
+       a blurred copy of it fills any letterbox space. */
+    .frame-fig {
+        --fh: clamp(13rem, 52vw, 20rem);
+        position: relative;
+        margin: 0;
+        height: var(--fh);
+        width: calc(var(--fh) * 3 / 2);
+        overflow: hidden;
+        border-radius: 4px;
+        background: #2a261f;
+    }
+
+    .frame-fig img {
         position: absolute;
         inset: 0;
-        background: rgba(0,0,0,0);
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        display: block;
+    }
+
+    .frame-bg {
+        object-fit: cover;
+        filter: blur(22px) brightness(0.55) saturate(1.2);
+        scale: 1.25;
+    }
+
+    .frame-img {
+        object-fit: contain;
+    }
+
+    .frame-meta {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: background 0.3s ease;
-        border-radius: 10px;
+        gap: 0.75rem;
+        align-items: baseline;
+        max-width: 22rem;
+        padding-top: 0.75rem;
     }
 
-    .overlay-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 50%;
-        background: rgba(255,255,255,0.15);
-        border: 2px solid rgba(255,255,255,0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transform: scale(0.7);
-        transition: opacity 0.3s ease, transform 0.3s ease;
-        backdrop-filter: blur(4px);
+    .frame-no {
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.16em;
+        color: var(--glow);
     }
 
-    .gallery-item:hover img {
-        transform: scale(1.06);
-    }
-
-    .gallery-item:hover .gallery-overlay {
-        background: rgba(0,0,0,0.30);
-    }
-
-    .gallery-item:hover .overlay-icon {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    .gallery-caption {
-        font-size: 0.78rem;
-        color: #999;
-        font-family: var(--font-sans);
-        padding: 0.4rem 0.2rem 0;
-        margin: 0;
+    .frame-cap {
+        font-family: var(--font-display);
+        font-size: 0.9375rem;
         line-height: 1.4;
+        color: var(--rule-soft);
+        font-variation-settings: "opsz" 24, "SOFT" 30, "WONK" 0;
     }
 
-    /* Lightbox */
+    .cursor {
+        display: none;
+    }
+
+    /* ── Desktop: pinned, scroll-driven reel ── */
+    @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
+        .reel-pin {
+            height: 100vh;
+            min-height: 36rem;
+            padding: 0;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .reel-panel {
+            position: relative;
+            z-index: 3;
+            flex: none;
+            width: clamp(22rem, 33vw, 31rem);
+            max-width: none;
+            margin: 0;
+            padding: 3.5rem 2rem 2.5rem max(2rem, calc((100vw - var(--container-width)) / 2 + 1rem));
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: var(--ink);
+            box-shadow: 2rem 0 2rem 0.5rem var(--ink);
+        }
+
+        .reel-title {
+            font-size: clamp(3rem, 5.2vw, 5rem);
+        }
+
+        .panel-mid,
+        .ticks,
+        .scroll-hint,
+        .reel-caption {
+            display: block;
+        }
+
+        .count {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+            font-family: var(--font-display);
+            line-height: 1;
+            font-variation-settings: "opsz" 144, "SOFT" 0, "WONK" 0;
+        }
+
+        .count-window {
+            display: block;
+            height: 1em;
+            font-size: clamp(5rem, 9vw, 8.5rem);
+            overflow: hidden;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--paper);
+        }
+
+        .count-roll {
+            display: block;
+            will-change: transform;
+        }
+
+        .count-roll span {
+            display: block;
+            height: 1em;
+            line-height: 1;
+        }
+
+        .count-total {
+            font-family: var(--font-mono);
+            font-size: 0.8125rem;
+            letter-spacing: 0.14em;
+            color: var(--rule-soft);
+        }
+
+        .reel-caption {
+            min-height: 4.5em;
+            margin: 0 0 1.5rem;
+            font-family: var(--font-display);
+            font-size: clamp(1.125rem, 1.6vw, 1.5rem);
+            line-height: 1.35;
+            color: var(--paper);
+            font-variation-settings: "opsz" 36, "SOFT" 30, "WONK" 0;
+        }
+
+        .ticks {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+
+        .tick {
+            width: 1.25rem;
+            height: 1.5rem;
+            padding: 0;
+            border: 0;
+            background: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tick::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 2px;
+            background: rgba(244, 239, 230, 0.25);
+            transition:
+                height 0.4s var(--ease-editorial),
+                background 0.4s var(--ease-editorial);
+        }
+
+        .tick:hover::after {
+            background: var(--paper);
+        }
+
+        .tick.is-active::after {
+            height: 100%;
+            background: var(--accent);
+            border-bottom: 2px solid var(--glow);
+        }
+
+        .tick:focus-visible {
+            outline: 2px solid var(--glow);
+        }
+
+        .scroll-hint {
+            margin: 0;
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--rule-soft);
+        }
+
+        .scroll-hint span {
+            display: inline-block;
+            animation: nudge 1.8s var(--ease-editorial) infinite;
+        }
+
+        @keyframes nudge {
+            50% {
+                transform: translateX(6px);
+            }
+        }
+
+        .reel-viewport {
+            flex: 1;
+            min-width: 0;
+            height: 100%;
+        }
+
+        .reel-track {
+            height: 100%;
+            padding: 0;
+            gap: 5vw;
+            overflow: visible;
+            scroll-snap-type: none;
+            align-items: stretch;
+            will-change: transform;
+        }
+
+        .frame {
+            display: flex;
+            align-items: center;
+            padding: 5vh 0;
+            /* spotlight: driven by --f (0..1) set from script */
+            opacity: calc(0.28 + 0.72 * var(--f, 1));
+            filter: grayscale(calc(1 - var(--f, 1)));
+        }
+
+        .frame-btn {
+            transform: scale(calc(0.9 + 0.1 * var(--f, 1)));
+            transform-origin: left center;
+            cursor: none;
+        }
+
+        .frame-fig {
+            --fh: min(46vh, 28rem);
+        }
+
+        .frame-meta {
+            opacity: var(--f, 1);
+        }
+
+        .cursor {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 4;
+            width: 4.5rem;
+            height: 4.5rem;
+            margin: -2.25rem 0 0 -2.25rem;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--font-mono);
+            font-size: 0.6875rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            pointer-events: none;
+            opacity: 0;
+            scale: 0.4;
+        }
+    }
+
+    /* ── Lightbox ── */
     .lightbox {
         position: fixed;
         inset: 0;
-        background: rgba(10, 10, 10, 0.94);
         z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(6px);
+        display: grid;
+        place-items: center;
+        color: var(--paper);
     }
 
-    .lightbox[hidden] { display: none; }
+    .lightbox[hidden] {
+        display: none;
+    }
 
-    .lightbox-content {
-        max-width: min(90vw, 1000px);
-        max-height: 85vh;
+    .lb-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(20, 18, 15, 0.97);
+    }
+
+    .lb-topbar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        z-index: 2;
+    }
+
+    .lb-counter,
+    .lb-btn {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+    }
+
+    .lb-counter {
+        color: var(--rule-soft);
+    }
+
+    .lb-btn {
+        background: none;
+        border: 1px solid rgba(244, 239, 230, 0.35);
+        border-radius: 999px;
+        color: var(--paper);
+        padding: 0.6rem 1rem;
+        cursor: pointer;
+        transition:
+            background 0.25s var(--ease-editorial),
+            color 0.25s var(--ease-editorial);
+    }
+
+    .lb-btn:hover,
+    .lb-btn:focus-visible {
+        background: var(--paper);
+        color: var(--ink);
+        outline: none;
+    }
+
+    .lb-nav {
+        position: absolute;
+        top: 50%;
+        translate: 0 -50%;
+        z-index: 2;
+        font-size: 1.125rem;
+        width: 3.25rem;
+        height: 3.25rem;
+        display: grid;
+        place-items: center;
+        padding: 0;
+    }
+
+    .lb-prev {
+        left: 1.5rem;
+    }
+
+    .lb-next {
+        right: 1.5rem;
+    }
+
+    .lb-stage {
+        position: relative;
+        margin: 0;
+        width: min(86vw, 1100px);
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: var(--spacing-sm);
+        justify-content: center;
+        gap: 1rem;
+        padding: 5rem 0 7.5rem;
+        touch-action: pan-y;
     }
 
-    .lightbox-img {
+    .lb-img {
         max-width: 100%;
-        max-height: 80vh;
+        max-height: 100%;
+        min-height: 0;
         object-fit: contain;
-        border-radius: 6px;
-        box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+        border-radius: 4px;
+        user-select: none;
+        will-change: transform, opacity;
     }
 
-    .lightbox-caption {
-        color: rgba(255,255,255,0.65);
-        font-size: 0.875rem;
+    .lb-caption {
+        font-family: var(--font-display);
+        font-size: 1.125rem;
         text-align: center;
-        font-family: var(--font-sans);
+        color: var(--paper);
+        font-variation-settings: "opsz" 24, "SOFT" 30, "WONK" 0;
+        min-height: 1.5em;
     }
 
-    .lightbox-close {
+    .lb-strip {
         position: absolute;
-        top: 20px;
-        right: 20px;
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 50%;
-        width: 44px;
-        height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        color: white;
-        transition: background 0.2s, transform 0.2s;
-    }
-
-    .lightbox-close:hover {
-        background: rgba(255,255,255,0.18);
-        transform: rotate(90deg);
-    }
-
-    .lightbox-nav {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        background: rgba(255,255,255,0.08);
-        border: 1px solid rgba(255,255,255,0.15);
-        border-radius: 50%;
-        width: 52px;
-        height: 52px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        color: white;
-        transition: background 0.2s, transform 0.2s;
-    }
-
-    .lightbox-nav:hover { background: rgba(255,255,255,0.18); }
-    .lightbox-prev { left: 20px; }
-    .lightbox-prev:hover { transform: translateY(-50%) translateX(-3px); }
-    .lightbox-next { right: 20px; }
-    .lightbox-next:hover { transform: translateY(-50%) translateX(3px); }
-
-    .lightbox-counter {
-        position: absolute;
-        bottom: 20px;
         left: 50%;
-        transform: translateX(-50%);
-        color: rgba(255,255,255,0.5);
-        font-size: 0.85rem;
-        font-family: var(--font-sans);
-        background: rgba(0,0,0,0.3);
-        padding: 3px 12px;
-        border-radius: 20px;
+        bottom: 1.25rem;
+        translate: -50% 0;
+        z-index: 2;
+        display: flex;
+        gap: 0.5rem;
+        max-width: calc(100vw - 2rem);
+        overflow-x: auto;
+        padding: 0.25rem;
+        scrollbar-width: none;
     }
 
-    @media (max-width: 900px) {
-        .gallery-masonry { column-count: 2; }
+    .lb-strip::-webkit-scrollbar {
+        display: none;
     }
 
-    @media (max-width: 520px) {
-        .gallery-masonry { column-count: 1; }
-        .lightbox-nav { display: none; }
+    .lb-thumb {
+        flex: none;
+        width: 3.5rem;
+        height: 3.5rem;
+        padding: 0;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        overflow: hidden;
+        background: none;
+        cursor: pointer;
+        opacity: 0.45;
+        transition:
+            opacity 0.3s var(--ease-editorial),
+            border-color 0.3s var(--ease-editorial),
+            transform 0.3s var(--ease-editorial);
+    }
+
+    .lb-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .lb-thumb:hover,
+    .lb-thumb:focus-visible {
+        opacity: 0.85;
+        outline: none;
+    }
+
+    .lb-thumb[aria-selected="true"] {
+        opacity: 1;
+        border-color: var(--paper);
+        transform: translateY(-3px);
+    }
+
+    @media (max-width: 560px) {
+        .lb-nav {
+            display: none;
+        }
+
+        .lb-stage {
+            width: 94vw;
+        }
     }
 </style>
 
 <script>
-    const items = Array.from(document.querySelectorAll<HTMLButtonElement>('.gallery-item'));
-    const lightbox = document.getElementById('lightbox') as HTMLElement;
-    const lbImg = document.getElementById('lightbox-img') as HTMLImageElement;
-    const lbCaption = document.getElementById('lightbox-caption') as HTMLElement;
-    const lbCounter = document.getElementById('lightbox-counter') as HTMLElement;
-    const lbClose = document.getElementById('lightbox-close') as HTMLButtonElement;
-    const lbPrev = document.getElementById('lightbox-prev') as HTMLButtonElement;
-    const lbNext = document.getElementById('lightbox-next') as HTMLButtonElement;
-    let current = 0;
+    import { gsap } from "gsap";
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-    function open(index: number) {
-        current = index;
-        const item = items[current];
-        lbImg.src = item.dataset.src ?? '';
-        lbImg.alt = item.dataset.alt ?? '';
-        lbCaption.textContent = item.dataset.alt ?? '';
-        lbCounter.textContent = `${current + 1} / ${items.length}`;
-        lightbox.hidden = false;
-        document.body.style.overflow = 'hidden';
-        lbClose.focus();
+    gsap.registerPlugin(ScrollTrigger);
+
+    const EASE = "expo.out";
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+
+    document.querySelectorAll<HTMLElement>("[data-reel]").forEach(initReel);
+
+    function initReel(root: HTMLElement) {
+        const pin = root.querySelector<HTMLElement>("[data-pin]")!;
+        const viewport = root.querySelector<HTMLElement>("[data-viewport]")!;
+        const track = root.querySelector<HTMLElement>("[data-track]")!;
+        const frames = Array.from(root.querySelectorAll<HTMLElement>("[data-frame]"));
+        const buttons = frames.map((f) => f.querySelector<HTMLButtonElement>(".frame-btn")!);
+        const figs = frames.map((f) => f.querySelector<HTMLElement>(".frame-fig")!);
+        const imgs = frames.map((f) => f.querySelector<HTMLImageElement>(".frame-img")!);
+        const ticks = Array.from(root.querySelectorAll<HTMLButtonElement>(".tick"));
+        const roll = root.querySelector<HTMLElement>("[data-roll]")!;
+        const captionEl = root.querySelector<HTMLElement>("[data-caption]")!;
+        const cursor = root.querySelector<HTMLElement>(".cursor")!;
+        const total = frames.length;
+
+        /* ── Pinned reel (desktop, motion allowed) ── */
+        const nativeScrollTo = (i: number) =>
+            buttons[i].scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+        let scrollToIndex: (i: number) => void = nativeScrollTo;
+
+        const mm = gsap.matchMedia();
+        mm.add("(min-width: 900px) and (prefers-reduced-motion: no-preference)", () => {
+            let active = -1;
+            let centres: number[] = [];
+            let x0 = 0;
+            let x1 = 0;
+            const focus = () => viewport.clientWidth * 0.34;
+
+            const measure = () => {
+                centres = frames.map((f) => f.offsetLeft + f.offsetWidth / 2);
+                // A wide first photo centred on the focus point would slide under
+                // the panel, so never start with its left edge closer than this.
+                const edge = 56;
+                x0 = Math.max(focus() - centres[0], edge);
+                x1 = focus() - centres[total - 1];
+            };
+            measure();
+
+            const setActive = (i: number) => {
+                if (i === active) return;
+                const first = active === -1;
+                const dir = i > active ? 1 : -1;
+                active = i;
+                ticks.forEach((t, k) => t.classList.toggle("is-active", k === i));
+                gsap.to(roll, {
+                    yPercent: (-100 * i) / total,
+                    duration: first ? 0 : 0.7,
+                    ease: EASE,
+                });
+                if (first) {
+                    captionEl.textContent = imgs[i].dataset.caption || "";
+                    return;
+                }
+                gsap.killTweensOf(captionEl);
+                gsap
+                    .timeline()
+                    .to(captionEl, { opacity: 0, y: -10 * dir, duration: 0.18, ease: "power2.in" })
+                    .add(() => {
+                        captionEl.textContent = imgs[i].dataset.caption || "";
+                    })
+                    .fromTo(
+                        captionEl,
+                        { opacity: 0, y: 14 * dir },
+                        { opacity: 1, y: 0, duration: 0.55, ease: EASE },
+                    );
+            };
+
+            const update = (x: number) => {
+                const span = viewport.clientWidth * 0.36;
+                let best = 0;
+                let bestF = -1;
+                frames.forEach((f, i) => {
+                    const d = centres[i] + x - focus();
+                    const fv = 1 - clamp(Math.abs(d) / span);
+                    f.style.setProperty("--f", fv.toFixed(3));
+                    f.style.setProperty("--p", clamp(d / span, -1, 1).toFixed(3));
+                    if (fv > bestF) {
+                        bestF = fv;
+                        best = i;
+                    }
+                });
+                setActive(best);
+            };
+
+            const tween = gsap.fromTo(
+                track,
+                { x: () => x0 },
+                {
+                    x: () => x1,
+                    ease: "none",
+                    onUpdate: () => update(gsap.getProperty(track, "x") as number),
+                },
+            );
+
+            const st = ScrollTrigger.create({
+                trigger: pin,
+                start: "top top",
+                end: () => `+=${Math.abs(x1 - x0) * 1.1}`,
+                pin: true,
+                scrub: 0.7,
+                animation: tween,
+                invalidateOnRefresh: true,
+                anticipatePin: 1,
+                onRefreshInit: () => {
+                    gsap.set(track, { x: 0 });
+                    measure();
+                },
+                onRefresh: () => update(gsap.getProperty(track, "x") as number),
+            });
+
+            scrollToIndex = (i) => {
+                // x that centres frame i on the focus point, as a fraction of x0 -> x1
+                const xi = clamp(focus() - centres[i], Math.min(x0, x1), Math.max(x0, x1));
+                const p = x0 === x1 ? 0 : (xi - x0) / (x1 - x0);
+                window.scrollTo({
+                    top: st.start + p * (st.end - st.start),
+                    behavior: "smooth",
+                });
+            };
+
+            /* Gentle autoplay: while the reel is pinned the page drifts forward on
+               its own. Any wheel / touch / key / pointer press hands control back
+               to the user; it resumes after a short idle. It never scrolls past
+               the end of the reel, and pauses while the viewer is open. */
+            const AUTO_SPEED = 60; // px per second
+            const RESUME_AFTER = 2500; // ms of no input
+            let userActive = false;
+            let idleTimer = 0;
+            let pos = 0;
+
+            const hold = () => {
+                userActive = true;
+                clearTimeout(idleTimer);
+                idleTimer = window.setTimeout(() => (userActive = false), RESUME_AFTER);
+            };
+            const inputEvents = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+            inputEvents.forEach((ev) => window.addEventListener(ev, hold, { passive: true }));
+
+            const autoplay = (_time: number, deltaMs: number) => {
+                if (userActive || document.hidden || !lb.hidden || !st.isActive) return;
+                const y = window.scrollY;
+                if (y >= st.end - 2) return;
+                // keep a float position so sub-pixel steps accumulate
+                if (Math.abs(y - pos) > 1.5) pos = y;
+                pos = Math.min(pos + (AUTO_SPEED * deltaMs) / 1000, st.end - 2);
+                window.scrollTo({ top: pos, behavior: "instant" });
+            };
+            gsap.ticker.add(autoplay);
+
+            // Photos change width as they load; re-measure once they settle
+            let t: number;
+            const settle = () => {
+                clearTimeout(t);
+                t = window.setTimeout(() => ScrollTrigger.refresh(), 150);
+            };
+            imgs.forEach((img) => {
+                if (!img.complete) img.addEventListener("load", settle, { once: true });
+            });
+
+            // Panel entrance
+            gsap.from(root.querySelectorAll(".reel-eyebrow, .reel-title, .reel-sub"), {
+                y: 30,
+                opacity: 0,
+                duration: 1.1,
+                ease: EASE,
+                stagger: 0.12,
+                scrollTrigger: { trigger: root, start: "top 70%", once: true },
+            });
+
+            // Cursor-following "Open" label over the photos
+            if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+                const cx = gsap.quickTo(cursor, "x", { duration: 0.45, ease: "power3" });
+                const cy = gsap.quickTo(cursor, "y", { duration: 0.45, ease: "power3" });
+                const onEnter = (e: PointerEvent) => {
+                    const r = viewport.getBoundingClientRect();
+                    gsap.set(cursor, { x: e.clientX - r.left, y: e.clientY - r.top });
+                    gsap.to(cursor, { opacity: 1, scale: 1, duration: 0.5, ease: EASE });
+                };
+                const onMove = (e: PointerEvent) => {
+                    const r = viewport.getBoundingClientRect();
+                    cx(e.clientX - r.left);
+                    cy(e.clientY - r.top);
+                };
+                const onLeave = () =>
+                    gsap.to(cursor, { opacity: 0, scale: 0.4, duration: 0.35, ease: "power2.out" });
+                buttons.forEach((b) => {
+                    b.addEventListener("pointerenter", onEnter);
+                    b.addEventListener("pointermove", onMove);
+                    b.addEventListener("pointerleave", onLeave);
+                });
+            }
+
+            // Keyboard focus on a photo brings it to the spotlight
+            buttons.forEach((b, i) =>
+                b.addEventListener("focus", () => {
+                    if (i !== active) scrollToIndex(i);
+                }),
+            );
+            ticks.forEach((tk, i) => tk.addEventListener("click", () => scrollToIndex(i)));
+
+            return () => {
+                gsap.ticker.remove(autoplay);
+                clearTimeout(idleTimer);
+                inputEvents.forEach((ev) => window.removeEventListener(ev, hold));
+                frames.forEach((f) => {
+                    f.style.removeProperty("--f");
+                    f.style.removeProperty("--p");
+                });
+                gsap.set([track, roll, captionEl], { clearProps: "all" });
+                scrollToIndex = nativeScrollTo;
+            };
+        });
+
+        /* ── Lightbox ── */
+        const lb = root.querySelector<HTMLElement>(".lightbox")!;
+        const backdrop = lb.querySelector<HTMLElement>(".lb-backdrop")!;
+        const stage = lb.querySelector<HTMLElement>(".lb-stage")!;
+        const lbImg = lb.querySelector<HTMLImageElement>(".lb-img")!;
+        const lbCaption = lb.querySelector<HTMLElement>(".lb-caption")!;
+        const counter = lb.querySelector<HTMLElement>(".lb-counter")!;
+        const strip = lb.querySelector<HTMLElement>(".lb-strip")!;
+        const stripThumbs = Array.from(lb.querySelectorAll<HTMLButtonElement>(".lb-thumb"));
+        const chrome = lb.querySelectorAll(".lb-topbar, .lb-nav, .lb-strip");
+        const closeBtn = lb.querySelector<HTMLButtonElement>(".lb-close")!;
+
+        let current = 0;
+        let isOpen = false;
+        let busy = false;
+
+        const load = async (i: number) => {
+            const t = imgs[i];
+            lbImg.src = t.currentSrc || t.src;
+            lbImg.alt = t.alt;
+            lbCaption.textContent = t.dataset.caption || "";
+            counter.textContent = `${String(i + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
+            stripThumbs.forEach((s, k) => s.setAttribute("aria-selected", String(k === i)));
+            const a = stripThumbs[i];
+            strip.scrollTo({
+                left: a.offsetLeft - strip.clientWidth / 2 + a.clientWidth / 2,
+                behavior: reduced ? "auto" : "smooth",
+            });
+            try {
+                await lbImg.decode();
+            } catch {
+                /* broken image: show whatever the browser renders */
+            }
+        };
+
+        // FLIP between a frame and the lightbox image (uniform scale + crop, no stretching)
+        const flipVars = (thumb: DOMRect, full: DOMRect) => {
+            const s = Math.max(thumb.width / full.width, thumb.height / full.height);
+            const cropX = Math.max(0, (full.width - thumb.width / s) / 2);
+            const cropY = Math.max(0, (full.height - thumb.height / s) / 2);
+            return {
+                x: thumb.left + thumb.width / 2 - (full.left + full.width / 2),
+                y: thumb.top + thumb.height / 2 - (full.top + full.height / 2),
+                scale: s,
+                clipPath: `inset(${cropY}px ${cropX}px ${cropY}px ${cropX}px round ${4 / s}px)`,
+            };
+        };
+        const flat = { x: 0, y: 0, scale: 1, clipPath: "inset(0px 0px 0px 0px round 4px)" };
+
+        const open = async (i: number) => {
+            if (isOpen) return;
+            isOpen = true;
+            busy = true;
+            current = i;
+            lb.hidden = false;
+            document.body.style.overflow = "hidden";
+            gsap.set(lbImg, { opacity: 0, clearProps: "transform,clipPath" });
+            await load(i);
+
+            if (reduced) {
+                gsap.set([backdrop, lbImg, lbCaption, chrome], { opacity: 1 });
+                busy = false;
+                closeBtn.focus();
+                return;
+            }
+
+            const from = flipVars(figs[i].getBoundingClientRect(), lbImg.getBoundingClientRect());
+            gsap.fromTo(backdrop, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power2.out" });
+            gsap.fromTo(
+                chrome,
+                { opacity: 0, y: (k) => (k === 3 ? 16 : -8) },
+                { opacity: 1, y: 0, duration: 0.7, delay: 0.3, ease: EASE, stagger: 0.06 },
+            );
+            gsap.fromTo(lbCaption, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.45, ease: EASE });
+            gsap.fromTo(
+                lbImg,
+                { opacity: 1, ...from },
+                {
+                    ...flat,
+                    duration: 1,
+                    ease: EASE,
+                    onComplete: () => {
+                        busy = false;
+                    },
+                },
+            );
+            closeBtn.focus();
+        };
+
+        const close = () => {
+            if (!isOpen) return;
+            isOpen = false;
+            const finish = () => {
+                lb.hidden = true;
+                document.body.style.overflow = "";
+                gsap.set([lbImg, backdrop, lbCaption, chrome], { clearProps: "all" });
+                buttons[current]?.focus({ preventScroll: true });
+                busy = false;
+            };
+            if (reduced) return finish();
+
+            busy = true;
+            const to = figs[current].getBoundingClientRect();
+            const onScreen =
+                to.bottom > 0 && to.top < window.innerHeight && to.right > 0 && to.left < window.innerWidth;
+            gsap.to([lbCaption, chrome], { opacity: 0, duration: 0.25 });
+            gsap.to(backdrop, { opacity: 0, duration: 0.7, ease: "power2.inOut" });
+            gsap.to(
+                lbImg,
+                onScreen
+                    ? {
+                          ...flipVars(to, lbImg.getBoundingClientRect()),
+                          duration: 0.8,
+                          ease: "expo.inOut",
+                          onComplete: finish,
+                      }
+                    : { opacity: 0, duration: 0.4, onComplete: finish },
+            );
+        };
+
+        const goTo = async (next: number, dir: number) => {
+            if (!isOpen || busy || next === current || total < 2) return;
+            busy = true;
+            await gsap.to(lbImg, { x: -70 * dir, opacity: 0, duration: 0.3, ease: "power2.in" });
+            current = next;
+            gsap.to(lbCaption, { opacity: 0, duration: 0.15 });
+            await load(next);
+            gsap.set(lbImg, { x: 70 * dir });
+            gsap.to(lbCaption, { opacity: 1, duration: 0.5, delay: 0.2 });
+            gsap.to(lbImg, {
+                x: 0,
+                opacity: 1,
+                duration: 0.7,
+                ease: EASE,
+                onComplete: () => {
+                    busy = false;
+                },
+            });
+        };
+        const step = (dir: number) => goTo((current + dir + total) % total, dir);
+
+        buttons.forEach((btn, i) => btn.addEventListener("click", () => open(i)));
+        stripThumbs.forEach((s, i) => s.addEventListener("click", () => goTo(i, i > current ? 1 : -1)));
+        closeBtn.addEventListener("click", close);
+        lb.querySelector(".lb-prev")!.addEventListener("click", () => step(-1));
+        lb.querySelector(".lb-next")!.addEventListener("click", () => step(1));
+        backdrop.addEventListener("click", close);
+        stage.addEventListener("click", (e) => {
+            if (e.target === stage) close();
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (!isOpen) return;
+            if (e.key === "Escape") close();
+            else if (e.key === "ArrowLeft") step(-1);
+            else if (e.key === "ArrowRight") step(1);
+            else if (e.key === "Tab") {
+                const focusable = Array.from(lb.querySelectorAll<HTMLElement>("button"));
+                const first = focusable[0];
+                const last = focusable[focusable.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        });
+
+        let startX = 0;
+        stage.addEventListener("pointerdown", (e) => (startX = e.clientX));
+        stage.addEventListener("pointerup", (e) => {
+            const dx = e.clientX - startX;
+            if (Math.abs(dx) > 50) step(dx < 0 ? 1 : -1);
+        });
     }
-
-    function close() {
-        lightbox.hidden = true;
-        document.body.style.overflow = '';
-        items[current]?.focus();
-    }
-
-    function navigate(dir: number) {
-        current = (current + dir + items.length) % items.length;
-        open(current);
-    }
-
-    items.forEach((item, i) => item.addEventListener('click', () => open(i)));
-    lbClose.addEventListener('click', close);
-    lbPrev.addEventListener('click', () => navigate(-1));
-    lbNext.addEventListener('click', () => navigate(1));
-    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) close(); });
-
-    document.addEventListener('keydown', (e) => {
-        if (lightbox.hidden) return;
-        if (e.key === 'Escape') close();
-        if (e.key === 'ArrowLeft') navigate(-1);
-        if (e.key === 'ArrowRight') navigate(1);
-    });
 </script>
