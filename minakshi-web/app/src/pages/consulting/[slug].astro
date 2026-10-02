@@ -1,0 +1,127 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { fetchConsultingBySlug } from "../../lib/payload/consulting";
+export const prerender = false;
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/consulting");
+
+const project = await fetchConsultingBySlug(slug);
+
+if (!project) {
+    return new Response(
+        `<!doctype html><html><head><title>Project not found</title></head><body style="font-family:sans-serif;text-align:center;padding:4rem">
+            <h1>Project not found</h1>
+            <p><a href="/consulting">← Back to Consulting</a></p>
+        </body></html>`,
+        { status: 404, headers: { "Content-Type": "text/html" } },
+    );
+}
+
+const paragraphs = project.description
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+---
+
+<BaseLayout title={`${project.organisation} | Consulting`} description={project.title}>
+    <section class="section">
+        <div class="container">
+            <a href="/consulting" class="back-link">← Back to Consulting</a>
+
+            <header class="detail-header">
+                {project.year && <p class="detail-eyebrow">{project.year}</p>}
+                <h1 class="detail-title">{project.organisation}</h1>
+                <p class="detail-subtitle">{project.title}</p>
+            </header>
+
+            <div class="detail-body">
+                {paragraphs.map((p) => <p>{p}</p>)}
+            </div>
+
+            {
+                project.domain.length > 0 && (
+                    <div class="detail-tags">
+                        {project.domain.map((d) => (
+                            <span>{d}</span>
+                        ))}
+                    </div>
+                )
+            }
+        </div>
+    </section>
+</BaseLayout>
+
+<style>
+    .back-link {
+        display: inline-block;
+        margin-bottom: 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink);
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: var(--accent);
+    }
+
+    .detail-header {
+        display: grid;
+        gap: 0.875rem;
+        padding-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        border-bottom: 1px solid var(--ink);
+    }
+
+    .detail-eyebrow {
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent);
+    }
+
+    .detail-title {
+        margin: 0;
+    }
+
+    .detail-subtitle {
+        margin: 0;
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        line-height: 1.4;
+        color: var(--ink-mid);
+        font-variation-settings: "opsz" 36, "SOFT" 30, "WONK" 0;
+    }
+
+    .detail-body {
+        max-width: var(--prose, 68ch);
+    }
+
+    .detail-body p {
+        font-family: var(--font-body);
+        font-size: 1.0625rem;
+        line-height: 1.75;
+        color: var(--ink-mid);
+        margin: 0 0 1.25rem;
+    }
+
+    .detail-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 0.75rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--ink);
+        font-family: var(--font-mono);
+        font-size: 0.6875rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink-soft);
+    }
+</style>

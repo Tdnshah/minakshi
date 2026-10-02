@@ -10,6 +10,15 @@ export const prerender = false;
 
 const consulting = await fetchConsulting();
 const films = await fetchFilms();
+
+const EXCERPT_LENGTH = 160;
+
+// Latest first; year is an optional string from the CMS, so compare numerically
+// and push entries without a year to the end. Copy before sorting.
+const yearOf = (y?: string) => parseInt(y ?? "", 10) || 0;
+const sortedConsulting = [...consulting].sort(
+    (a, b) => yearOf(b.year) - yearOf(a.year),
+);
 ---
 
 <BaseLayout title="Consulting & Collaborations">
@@ -30,17 +39,26 @@ const films = await fetchFilms();
             <SectionHeader
                 eyebrow="Advisory"
                 title="Development"
-                italicPart="consulting."
+                italicPart="consulting"
             />
             <div class="consulting-grid">
                 {
-                    consulting.map((project) => (
+                    sortedConsulting.map((project) => (
                         <ThemedCard
-                            eyebrow={project.year}
+                            // eyebrow={project.year}
                             title={project.organisation}
                             subtitle={project.title}
-                            description={project.description}
+                            description={
+                                project.description.length > EXCERPT_LENGTH
+                                    ? `${project.description.slice(0, EXCERPT_LENGTH).trim()}...`
+                                    : project.description
+                            }
                             tags={project.domain}
+                            href={
+                                project.description.length > EXCERPT_LENGTH
+                                    ? `/consulting/${project.slug}`
+                                    : undefined
+                            }
                         />
                     ))
                 }
@@ -49,7 +67,7 @@ const films = await fetchFilms();
             <SectionHeader
                 eyebrow="Creative Partnerships"
                 title="Film & Documentary"
-                italicPart="collaborations."
+                italicPart="collaborations"
             />
 
             <div class="intro">
@@ -93,10 +111,46 @@ const films = await fetchFilms();
     .consulting-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1px;
-        background: var(--ink);
-        border: 1px solid var(--ink);
+        /* Hairlines are drawn per card (not via a filled grid background) so an
+           incomplete last row doesn't show empty ink-coloured cells. */
+        border-top: 1px solid var(--ink);
+        border-left: 1px solid var(--ink);
         margin-bottom: 3.5rem;
+    }
+
+    /* Each card spans 5 grid rows and inherits them via subgrid, so title,
+       subtitle, description, tags and link line up across cards in a row
+       whatever their content height. Explicit rows keep a missing subtitle
+       or link from shifting the others. */
+    .consulting-grid > :global(.themed-card) {
+        border-right: 1px solid var(--ink);
+        border-bottom: 1px solid var(--ink);
+        display: grid;
+        grid-row: span 5;
+        grid-template-rows: subgrid;
+        row-gap: 0.875rem;
+        align-content: start;
+    }
+
+    .consulting-grid > :global(.themed-card > .themed-title) {
+        grid-row: 1;
+    }
+    .consulting-grid > :global(.themed-card > .themed-subtitle) {
+        grid-row: 2;
+    }
+    .consulting-grid > :global(.themed-card > .themed-description) {
+        grid-row: 3;
+    }
+    .consulting-grid > :global(.themed-card > .themed-tags) {
+        grid-row: 4;
+        margin-top: 0;
+        padding-top: 0;
+        align-self: start;
+    }
+    .consulting-grid > :global(.themed-card > .themed-action) {
+        grid-row: 5;
+        margin-top: 0;
+        align-self: start;
     }
 
     .films-list {
