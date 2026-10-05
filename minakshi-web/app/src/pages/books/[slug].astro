@@ -35,7 +35,18 @@ if (!book) {
     );
 }
 
-const descriptionHtml = book.description ? lexicalToHtml(book.description) : "";
+let descriptionHtml = book.description ? lexicalToHtml(book.description) : "";
+let descriptionTitle = "About the book";
+
+// Extract h2 from description if present and use it as the section title
+if (descriptionHtml) {
+    const h2Match = descriptionHtml.match(/<h2[^>]*>(.*?)<\/h2>/);
+    if (h2Match) {
+        descriptionTitle = h2Match[1];
+        descriptionHtml = descriptionHtml.replace(/<h2[^>]*>.*?<\/h2>/, "");
+    }
+}
+
 const coverUrl = book.coverImage?.url ?? "";
 
 const galleryImages = (book.eventGallery ?? [])
@@ -57,6 +68,14 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
     type: m.type,
     date: m.date,
 }));
+
+const formattedReleaseDate = book.releaseDate
+    ? new Date(book.releaseDate).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+    })
+    : "";
+
 ---
 
 <BookLayout title={book.title} description={typeof book.description === 'string' ? book.description : book.title}>
@@ -69,7 +88,7 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
         coverImage={coverUrl}
         coverAlt={`Cover of ${book.title}`}
         publisher={book.publisher}
-        releaseDate={book.releaseDate}
+        releaseDate={formattedReleaseDate}
         awardsCount={book.awards?.length ?? 0}
     >
         <Fragment slot="buy">
@@ -85,7 +104,7 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
             <div class="container">
                 <div class="synopsis-eyebrow-wrap">
                     {/* <p class="eyebrow">About the book</p> */}
-                    <h2>About the book</h2>
+                    <h2>{descriptionTitle}</h2>
                 </div>
                 <div class="prose" set:html={descriptionHtml} />
             </div>
@@ -111,8 +130,8 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
     {reviewItems.length > 0 && (
         <BookPressGrid
             items={reviewItems}
-            eyebrow="What others have"
-            heading="Reviews"
+            eyebrow="What reviewers have to say"
+            heading=""
             headingItalic=""
         />
     )}
@@ -122,8 +141,8 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
         <BookPressGrid
             items={mediaItems}
             eyebrow="As seen in"
-            heading="Media coverage"
-            headingItalic=""
+            heading="Media"
+            headingItalic="coverage"
         />
     )}
 
@@ -168,7 +187,7 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
             <div
                 id="cusdis_thread"
                 data-host="https://cusdis.com"
-                data-app-id="0eb2bb71-8b26-41c8-ba8a-8ce6995af072"
+                data-app-id="74263bf9-1702-4d80-b5f5-1c3bb8c974cb"
                 data-page-id={slug}
                 data-page-url={currentPath}
                 data-page-title={book.title}
@@ -222,10 +241,171 @@ const mediaItems = (book.mediaCoverage ?? []).map((m) => ({
         font-size: 1.0625rem;
         line-height: 1.75;
         color: var(--ink-mid);
-        margin: 0 0 1.25rem 0;
+        margin: 0 0 2rem 0;
     }
 
     .prose :global(p:last-child) { margin-bottom: 0; }
+
+    .prose :global(h1) {
+        font-family: var(--font-display);
+        font-size: 2rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--ink);
+        margin: 3.5rem 0 2rem 0;
+    }
+
+    .prose :global(h2) {
+        font-family: var(--font-display);
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1.3;
+        color: var(--ink);
+        margin: 3rem 0 1.75rem 0;
+    }
+
+    .prose :global(h3) {
+        font-family: var(--font-display);
+        font-size: 1.25rem;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--ink);
+        margin: 2.5rem 0 1.5rem 0;
+    }
+
+    .prose :global(h4) {
+        font-family: var(--font-display);
+        font-size: 1.125rem;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--ink);
+        margin: 2rem 0 1.25rem 0;
+    }
+
+    .prose :global(ul),
+    .prose :global(ol) {
+        margin: 1.5rem 0;
+        padding-left: 1.75rem;
+    }
+
+    .prose :global(li) {
+        font-family: var(--font-body);
+        font-size: 1.0625rem;
+        line-height: 1.75;
+        color: var(--ink-mid);
+        margin-bottom: 0.5rem;
+    }
+
+    .prose :global(blockquote) {
+        margin: 1.75rem 0;
+        padding-left: 1.5rem;
+        border-left: 3px solid var(--accent);
+        font-style: italic;
+        color: var(--ink-mid);
+    }
+
+    .prose :global(hr) {
+        margin: 2.5rem 0;
+        border: none;
+        border-top: 1px solid var(--rule-soft);
+    }
+
+    .prose :global(figure) {
+        margin: 2rem 0;
+    }
+
+    .prose :global(figure img) {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 0.5rem;
+    }
+
+    .prose :global(figcaption) {
+        margin-top: 0.75rem;
+        font-size: 0.95rem;
+        color: var(--ink-soft);
+        font-style: italic;
+    }
+
+    .prose :global(code) {
+        font-family: var(--font-mono);
+        font-size: 0.9em;
+        background: var(--paper-soft);
+        color: var(--accent);
+        padding: 0.2em 0.4em;
+        border-radius: 0.25rem;
+    }
+
+    .prose :global(u) {
+        text-decoration: underline;
+        text-decoration-style: solid;
+        text-underline-offset: 2px;
+    }
+
+    .prose :global(s) {
+        text-decoration: line-through;
+        color: var(--ink-soft);
+    }
+
+    .prose :global(sub),
+    .prose :global(sup) {
+        font-size: 0.85em;
+        line-height: 0;
+        position: relative;
+        vertical-align: baseline;
+    }
+
+    .prose :global(sup) {
+        top: -0.5em;
+    }
+
+    .prose :global(sub) {
+        bottom: -0.25em;
+    }
+
+    .media-columns {
+        display: grid;
+        gap: 1.5rem;
+        margin: 2rem 0;
+    }
+
+    .media-columns--2col {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .media-columns--3col {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .media-columns--4col {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .media-columns figure {
+        margin: 0;
+    }
+
+    .media-columns figcaption {
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--ink-soft);
+    }
+
+    @media (max-width: 768px) {
+        .media-columns--3col,
+        .media-columns--4col {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 640px) {
+        .media-columns--2col,
+        .media-columns--3col,
+        .media-columns--4col {
+            grid-template-columns: 1fr;
+        }
+    }
 
     .prose :global(em) {
         color: var(--ink);

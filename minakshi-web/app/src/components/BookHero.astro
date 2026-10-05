@@ -13,7 +13,10 @@ interface Props {
 const { title, subtitle, excerpt, coverImage, coverAlt, publisher, releaseDate, awardsCount } = Astro.props;
 
 const formattedDate = releaseDate
-    ? new Date(releaseDate).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
+    ? new Date(releaseDate).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+    })
     : null;
 
 const releaseYear = releaseDate ? new Date(releaseDate).getFullYear() : null;

@@ -64,6 +64,12 @@ function fmtDate(d?: string) {
                             {item.reviewer && <span class="meta">{item.reviewer}</span>}
                             {item.date && <span class="meta">{fmtDate(item.date)}</span>}
                         </cite>
+                         {item.url && (
+                           
+                            <a href={item.url} target="_blank" rel="noopener noreferrer" class="card-link">
+                                Read →
+                            </a>
+                        )}
                     </article>
                 ) : (
                     /* Media article variant — linked card */
@@ -81,6 +87,7 @@ function fmtDate(d?: string) {
                             <p class="card-title card-title--plain">{item.title}</p>
                         )}
                         {item.url && (
+                           
                             <a href={item.url} target="_blank" rel="noopener noreferrer" class="card-link">
                                 Read →
                             </a>
@@ -124,6 +131,10 @@ function fmtDate(d?: string) {
     }
 
     /* ── Review variant ── */
+    .press-card--review {
+        position: relative;
+    }
+
     blockquote {
         font-family: var(--font-display);
         font-size: 1.0625rem;
@@ -134,6 +145,32 @@ function fmtDate(d?: string) {
         margin: 0;
         padding: 0;
         border: none;
+        padding-left: 2rem;
+        position: relative;
+    }
+
+    blockquote::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1.5rem;
+        height: 1.5rem;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M.78,8.89c0-3.07,1.53-4.3,4.3-4.34L5.38,6C3.78,6.17,3,7,3.1,8.31H4.54V12H.78Zm5.9,0c0-3.07,1.53-4.3,4.3-4.34L11.28,6C9.68,6.17,8.89,7,9,8.31h1.44V12H6.68Z' fill='%237a1f1f'/%3E%3C/svg%3E") no-repeat;
+        background-size: contain;
+        opacity: 0.8;
+    }
+
+    blockquote::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 1.5rem;
+        height: 1.5rem;
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16.94,15.11c0,3.07-1.53,4.3-4.3,4.34L12.35,18c1.6-.16,2.39-1,2.28-2.3H13.18V12h3.76Zm5.9,0c0,3.07-1.53,4.3-4.3,4.34L18.24,18c1.6-.16,2.39-1,2.28-2.3H19.08V12h3.76Z' fill='%237a1f1f'/%3E%3C/svg%3E") no-repeat;
+        background-size: contain;
+        opacity: 0.8;
     }
 
     cite {

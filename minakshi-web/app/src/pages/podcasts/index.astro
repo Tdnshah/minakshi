@@ -38,7 +38,7 @@ const formatDate = (date: Date) => {
                 <SectionHeader
                     eyebrow="Series"
                     title="Podcasts"
-                    italicPart="archive."
+                    italicPart="archive"
                 />
                  <div class="podcasts-grid">
                     {
@@ -48,6 +48,15 @@ const formatDate = (date: Date) => {
                                 class="podcast-card"
                             >
                                 <article>
+                                    {podcast.thumbnail?.url && (
+                                        <div class="podcast-image">
+                                            <img
+                                                src={podcast.thumbnail.url}
+                                                alt={podcast.title}
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    )}
                                     <div class="podcast-content">
                                         <div class="podcast-meta">
                                             <span class="platform-badge">
@@ -93,6 +102,15 @@ const formatDate = (date: Date) => {
                                 class="podcast-card"
                             >
                                 <article>
+                                    {interview.thumbnail?.url && (
+                                        <div class="podcast-image">
+                                            <img
+                                                src={interview.thumbnail.url}
+                                                alt={interview.title}
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    )}
                                     <div class="podcast-content">
                                         <div class="podcast-meta">
                                             <span class="platform-badge">
@@ -143,6 +161,32 @@ const formatDate = (date: Date) => {
         transition: border-color 0.24s var(--ease-editorial), transform 0.24s var(--ease-editorial);
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+    }
+
+    article {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .podcast-image {
+        width: 100%;
+        height: 200px;
+        overflow: hidden;
+        background: var(--paper-deep);
+        flex-shrink: 0;
+    }
+
+    .podcast-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.24s var(--ease-editorial);
+    }
+
+    .podcast-card:hover .podcast-image img {
+        transform: scale(1.05);
     }
 
     .podcast-card:hover {

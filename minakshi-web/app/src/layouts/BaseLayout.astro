@@ -43,10 +43,24 @@ const { title, description = "Minakshi Dewan - Researcher, Author, Academic" } =
 
                     gtag('config', 'G-VFG97T6WN5');
                 </script>
-                <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
                 </>
             )
         }
+
+        <!-- Cusdis comments script -->
+        <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+        <script is:inline>
+            // Set Cusdis theme when loaded
+            window.addEventListener('load', () => {
+                if (window.CUSDIS) {
+                    console.log('Cusdis loaded, setting theme...');
+                    window.CUSDIS.setTheme('auto');
+                } else {
+                    console.log('Cusdis not available');
+                }
+            });
+        </script>
+
 
         <title>{title} | Minakshi Dewan</title>
     </head>
